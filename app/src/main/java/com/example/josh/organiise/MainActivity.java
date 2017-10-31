@@ -6,6 +6,7 @@ import java.util.*;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.*;
+import android.text.TextUtils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.app.Notification;
@@ -33,6 +34,12 @@ public class MainActivity extends AppCompatActivity {
     EditText action;
     //A string ArrayList which will save all the unquie actions that the user has saved to the phone..
     ArrayList<String> actionArray = new ArrayList<String>();
+
+    //an int arrayList that will keep track of how many times each action has been chosen.
+    ArrayList<Integer> actionCounter = new ArrayList<Integer>();
+
+
+
     TextView addText;
     Spinner actionMenu;
 
@@ -70,6 +77,10 @@ public class MainActivity extends AppCompatActivity {
             actionMenu.setAdapter(spinnerArray);
         }
 
+        if(tinydb.getListInt("counter").size() != 0) {
+            actionCounter = tinydb.getListInt("counter");
+        }
+
 
 
         //reference to the button which will submit the action.
@@ -83,43 +94,78 @@ public class MainActivity extends AppCompatActivity {
                 boolean notDuplicate = false;
 
                 //Have to add this as we do not go around the for loop with an empty array...
-                if(actionArray.size() == 0) {
+                if (actionArray.size() == 0) {
                     notDuplicate = true;
                 }
 
                 String currentAction = action.getText().toString();
 
-                //checking to see if the action that we are trying to add is already in the array.
-                for(int i = 0; i < actionArray.size(); i = i + 1) {
+                //only do this if the user has not left the box blank.
+                if (!TextUtils.isEmpty(action.getText().toString())) {
+                    //checking to see if the action that we are trying to add is already in the array.
+                    for (int i = 0; i < actionArray.size(); i = i + 1) {
 
-                    //setting this to true each tick as we have not yet compared.
-                    notDuplicate = true;
-                    //comparing the current element with what has been enteTesred by the user.
-                    if(actionArray.get(i).equals(currentAction)) {
-                        //if it is a duplicate then we will set notDuplicate to false, and get out of the for loop so we don't accidently set it to true.
-                        notDuplicate = false;
-                        //this is where we will increase the count for this element.
+                        //setting this to true each tick as we have not yet compared.
+                        notDuplicate = true;
+                        //comparing the current element with what has been enteTesred by the user.
+                        if (actionArray.get(i).equals(currentAction)) {
+                            //if it is a duplicate then we will set notDuplicate to false, and get out of the for loop so we don't accidently set it to true.
+                            notDuplicate = false;
+                            //this is where we will increase the count for this element.
+                            //Firstly, we will increment the current value by one.
+                            int newActionCounter = actionCounter.get(i) + 1;
+                            //then we will set the current action counter to be this.
+                            actionCounter.set(i, newActionCounter);
 
-                        //making the application tell you that the element is already present so the user knows to use the drop down meny instead, THIS IS NOT FINAL! we will increment instead in the future.
-                        addText.setText("Action already entered. Please use drop down menu!");
-                        System.out.println("Action " + i + " is: " + actionArray.get(i) + " the typed action is: " + currentAction);
-                        //getting out the for loop early.
-                        break;
+                            //making the application tell you that the element is already present so the user knows to use the drop down meny instead, THIS IS NOT FINAL! we will increment instead in the future.
+                            addText.setText("Action already entered. Please use drop down menu!");
+                            System.out.println("Action: " + actionArray.get(i) + " has been selected " + actionCounter.get(i) + " times");
+                            //getting out the for loop early.
+                            break;
+                        }
+                    }
+
+                    if (notDuplicate) {
+                        actionArray.add(action.getText().toString());
+                        //informing the user that there action has been registered to the array.
+                        addText.setText("Action registered!");
+
+                        Context context = MainActivity.this.getApplicationContext();
+
+
+                        actionCounter.add(1);
+
+                        TinyDB tinydb = new TinyDB(context);
+                        tinydb.putListString("actions", actionArray);
+                        tinydb.putListInt("counter", actionCounter);
+
+                        System.out.println("New element detected...");
                     }
                 }
+                //or if the action array is 0 this means that the user has never typed anything in the box, and there is no history, in this case do nothing
+                else if(TextUtils.isEmpty(action.getText().toString()) && actionArray.size() == 0) {
+                    addText.setText("Please type something in the text box above.");
+                } else {
+                    String dropDownMenuText = actionMenu.getSelectedItem().toString();
+                    for(int i = 0; i < actionArray.size(); i = i + 1) {
+                        if(actionArray.get(i).equals(dropDownMenuText)) {
+                            //Firstly, we will increment the current value by one.
+                            int newActionCounter = actionCounter.get(i) + 1;
+                            //then we will set the current action counter to be this.
+                            actionCounter.set(i, newActionCounter);
 
-                if(notDuplicate) {
-                    actionArray.add(action.getText().toString());
-                    //informing the user that there action has been registered to the array.
+                            System.out.println("Action: " + actionArray.get(i) + " has been selected " + actionCounter.get(i) + " times");
+
+                            break;
+                        }
+                    }
                     addText.setText("Action registered!");
+                    System.out.println("Drop down menu: " + dropDownMenuText);
 
                     Context context = MainActivity.this.getApplicationContext();
                     TinyDB tinydb = new TinyDB(context);
-                    tinydb.putListString("actions", actionArray);
+                    tinydb.putListInt("counter", actionCounter);
 
-
-
-                    System.out.println("New element detected...");
                 }
             }
         });
