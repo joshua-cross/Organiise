@@ -2,6 +2,7 @@ package com.example.josh.organiise;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.*;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -24,6 +25,9 @@ import android.content.Intent;
 public class MainActivity extends AppCompatActivity {
 
     EditText action;
+    //A string ArrayList which will save all the unquie actions that the user has saved to the phone..
+    List<String> actionArray = new ArrayList<String>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,39 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 System.out.println(action.getText().toString());
                 showNotification();
+
+                //a boolean which will return true at the end of the array if there is no element that contrains the same string.
+                boolean notDuplicate = false;
+
+                //Have to add this as we do not go around the for loop with an empty array...
+                if(actionArray.size() == 0) {
+                    notDuplicate = true;
+                }
+
+                String currentAction = action.getText().toString();
+
+                //checking to see if the action that we are trying to add is already in the array.
+                for(int i = 0; i < actionArray.size(); i = i + 1) {
+
+                    //setting this to true each tick as we have not yet compared.
+                    notDuplicate = true;
+                    //comparing the current element with what has been enteTesred by the user.
+                    if(actionArray.get(i).equals(currentAction)) {
+                        //if it is a duplicate then we will set notDuplicate to false, and get out of the for loop so we don't accidently set it to true.
+                        notDuplicate = false;
+                        //this is where we will increase the count for this element.
+
+
+                        System.out.println("Action " + i + " is: " + actionArray.get(i) + " the typed action is: " + currentAction);
+                        //getting out the for loop early.
+                        break;
+                    }
+                }
+
+                if(notDuplicate) {
+                    actionArray.add(action.getText().toString());
+                    System.out.println("New element detected...");
+                }
             }
         });
     }
