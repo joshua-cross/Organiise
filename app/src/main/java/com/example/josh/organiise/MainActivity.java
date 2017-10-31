@@ -3,7 +3,11 @@ package com.example.josh.organiise;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.*;
-
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.*;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -14,10 +18,12 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.res.Resources;
-
 //import that's needed for the input boxes.
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Spinner;
 //import needed for button
 import android.widget.Button;
 //importing the intent.
@@ -26,7 +32,15 @@ public class MainActivity extends AppCompatActivity {
 
     EditText action;
     //A string ArrayList which will save all the unquie actions that the user has saved to the phone..
-    List<String> actionArray = new ArrayList<String>();
+    ArrayList<String> actionArray = new ArrayList<String>();
+    TextView addText;
+    Spinner actionMenu;
+
+    //the array that's needed for the Spinner.
+    ArrayAdapter<String> spinnerArray;
+
+    //the actionArray needs to be converted to a set to be saved.
+    Set<String> actionSet = new HashSet<String>();
 
 
     @Override
@@ -38,6 +52,26 @@ public class MainActivity extends AppCompatActivity {
 
         //creating a reference to the ACTION input.
         action = (EditText) findViewById(R.id.currentAction);
+
+        //the text that tells the user if the data was added.
+        addText = (TextView) findViewById(R.id.Add);
+
+        //the drop down menus for the actions.
+        actionMenu = (Spinner) findViewById(R.id.ActionMenu);
+
+
+        Context context = MainActivity.this.getApplicationContext();
+        TinyDB tinydb = new TinyDB(context);
+
+
+        if(tinydb.getListString("actions").size() != 0) {
+            actionArray = tinydb.getListString("actions");
+            spinnerArray = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, actionArray);
+            actionMenu.setAdapter(spinnerArray);
+        }
+
+
+
         //reference to the button which will submit the action.
         Button sumbitAction = (Button) findViewById(R.id.submitAction);
         sumbitAction.setOnClickListener(new View.OnClickListener() {
@@ -66,7 +100,8 @@ public class MainActivity extends AppCompatActivity {
                         notDuplicate = false;
                         //this is where we will increase the count for this element.
 
-
+                        //making the application tell you that the element is already present so the user knows to use the drop down meny instead, THIS IS NOT FINAL! we will increment instead in the future.
+                        addText.setText("Action already entered. Please use drop down menu!");
                         System.out.println("Action " + i + " is: " + actionArray.get(i) + " the typed action is: " + currentAction);
                         //getting out the for loop early.
                         break;
@@ -75,12 +110,20 @@ public class MainActivity extends AppCompatActivity {
 
                 if(notDuplicate) {
                     actionArray.add(action.getText().toString());
+                    //informing the user that there action has been registered to the array.
+                    addText.setText("Action registered!");
+
+                    Context context = MainActivity.this.getApplicationContext();
+                    TinyDB tinydb = new TinyDB(context);
+                    tinydb.putListString("actions", actionArray);
+
+
+
                     System.out.println("New element detected...");
                 }
             }
         });
     }
-
 
     //TO-DO: need a timer for every day/week/month to show the pie chart, this will need a new notification menu aswell...
 
