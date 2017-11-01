@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.io.*;
 import android.text.TextUtils;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.content.SharedPreferences;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -44,11 +46,18 @@ public class MainActivity extends AppCompatActivity {
     TextView addText;
     Spinner actionMenu;
 
+    //text view array for the 5 actions.
+    TextView[] actionText = new TextView[5];
+
+
     //the array that's needed for the Spinner.
     ArrayAdapter<String> spinnerArray;
 
     //the actionArray needs to be converted to a set to be saved.
     Set<String> actionSet = new HashSet<String>();
+
+    //ArrayList, which can hold 5 of the previous actions which will be displayed to the user.
+    ArrayList<String> previousActions = new ArrayList<String>();
 
 
     @Override
@@ -67,6 +76,17 @@ public class MainActivity extends AppCompatActivity {
         //the drop down menus for the actions.
         actionMenu = (Spinner) findViewById(R.id.ActionMenu);
 
+        //setting the actions array.
+        actionText[0] = (TextView) findViewById((R.id.previousAction));
+        actionText[1] = (TextView) findViewById((R.id.PreviousAction1));
+        actionText[2] = (TextView) findViewById((R.id.previousAction2));
+        actionText[3] = (TextView) findViewById((R.id.previousAction3));
+        actionText[4] = (TextView) findViewById((R.id.previousAction4));
+
+
+
+
+
 
         Context context = MainActivity.this.getApplicationContext();
         TinyDB tinydb = new TinyDB(context);
@@ -82,6 +102,12 @@ public class MainActivity extends AppCompatActivity {
             actionCounter = tinydb.getListInt("counter");
         }
 
+        if(tinydb.getListString("previous").size() != 0) {
+            previousActions = tinydb.getListString("previous");
+        }
+
+        //setting the previousText boxes initially.
+        drawPrevious();
 
 
         //reference to the button which will submit the action.
@@ -121,6 +147,9 @@ public class MainActivity extends AppCompatActivity {
                             //then we will set the current action counter to be this.
                             actionCounter.set(i, newActionCounter);
 
+                            //setting one of the previous actions.
+                            setPreviousActions(actionArray.get(i));
+
                             //making the application tell you that the element is already present so the user knows to use the drop down meny instead, THIS IS NOT FINAL! we will increment instead in the future.
                             addText.setText("Action already entered. Please use drop down menu!");
                             System.out.println("Action: " + actionArray.get(i) + " has been selected " + actionCounter.get(i) + " times");
@@ -135,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
                         addText.setText("Action registered!");
 
                         Context context = MainActivity.this.getApplicationContext();
+                        setPreviousActions(action.getText().toString());
 
 
                         actionCounter.add(1);
@@ -163,6 +193,7 @@ public class MainActivity extends AppCompatActivity {
 
                     //rearranging the array so we know that dropDownMenuText was the last element selected.
                     rearrangeArray(dropDownMenuText);
+                    setPreviousActions(dropDownMenuText);
 
                     //resetting the edit text.
                     action.setText(null);
@@ -182,11 +213,13 @@ public class MainActivity extends AppCompatActivity {
         //int millis = ((hours*60)+mins)*60000; // Need milliseconds to use Timer
         int millis = 10000;
 
-        new Timer().schedule(new TimerTask()
-        {
+
+        //Had to use handler instead of Java timer as this did not allow for the GUI to be updated.
+        Handler handler = new Handler();
+
+        handler.postDelayed(new Runnable() {
             @Override
-            public void run()
-            {
+            public void run() {
                 //code that runs when timer is done
                 //showing the notification.
                 showNotification();
@@ -200,8 +233,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                     //else there is something in the array so we will increment the last chosen item by one.
                     else {
+
+                        String currLast = getLastAction(1);
                         //incrementing the last action in the array.
-                        incrementArray(getLastAction(1));
+                        incrementArray(currLast);
+                        //setPreviousActions(currLast);
+                        setPreviousActions(currLast);
                     }
                 }
 
@@ -210,6 +247,8 @@ public class MainActivity extends AppCompatActivity {
             }
         }, millis);
     }
+
+
 
     //Getting the a specific integer in the array (1 being the last, 2 being the second 2 last etc.) and returning it to be used elsewhere.
     private String getLastAction(int arraySelector) {
@@ -221,6 +260,69 @@ public class MainActivity extends AppCompatActivity {
             System.out.println("last action was: " + actionArray.get(actionArray.size() - arraySelector));
             //returning the last element in the array.
             return actionArray.get(actionArray.size() - arraySelector);
+        }
+
+    }
+
+    //method that checks the current length of the previousActions array, and if the length is less than 5, it adds a new element, else it removes the first and adds the new one.
+    private void setPreviousActions(String actionInput) {
+        //System.out.println("There are: " + previousActions.size() + " previous actions.");
+        //if there are currently less than 5 elements, then we will simply add an element.
+        if(previousActions.size() < 4) {
+            previousActions.add(actionInput);
+        }
+        //else there are more than 5 elements so we will remove the first and add the new element.
+        else {
+            //in case something goes wrong we will ensure there is enough room to add a new element.
+            while(previousActions.size() != 4) {
+                //removing the first action from the array.
+                previousActions.remove(0);
+            }
+            previousActions.add(actionInput);
+        }
+
+        //ADD the tinyDB here.
+        Context context = MainActivity.this.getApplicationContext();
+        TinyDB tinydb = new TinyDB(context);
+        tinydb.putListString("previous", actionArray);
+
+        drawPrevious();
+
+    }
+
+    private void drawPrevious() {
+
+        System.out.println("There are: " + previousActions.size() + " previous actions.");
+        int tmpSize = previousActions.size();
+
+        if(tmpSize == 1) {
+            actionText[0].setText(previousActions.get(0));
+        } else if (tmpSize == 2) {
+            actionText[0].setText(previousActions.get(0));
+            actionText[1].setText(previousActions.get(1));
+        } else if (tmpSize == 3) {
+            actionText[0].setText(previousActions.get(0));
+            actionText[1].setText(previousActions.get(1));
+            actionText[2].setText(previousActions.get(2));
+        } else if (tmpSize == 4) {
+            actionText[0].setText(previousActions.get(0));
+            actionText[1].setText(previousActions.get(1));
+            actionText[2].setText(previousActions.get(2));
+            actionText[3].setText(previousActions.get(3));
+        } else if(tmpSize == 5) {
+            actionText[0].setText(previousActions.get(0));
+            actionText[1].setText(previousActions.get(1));
+            actionText[2].setText(previousActions.get(2));
+            actionText[3].setText(previousActions.get(3));
+            actionText[4].setText(previousActions.get(4));
+        } else if (tmpSize > 5) {
+            actionText[0].setText(previousActions.get(0));
+            actionText[1].setText(previousActions.get(1));
+            actionText[2].setText(previousActions.get(2));
+            actionText[3].setText(previousActions.get(3));
+            actionText[4].setText(previousActions.get(4));
+        } else {
+            System.out.println("Not sure...");
         }
 
     }
