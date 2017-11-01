@@ -141,33 +141,28 @@ public class MainActivity extends AppCompatActivity {
 
                         System.out.println("New element detected...");
                     }
+
+                    //resetting the edit text.
+                    action.setText(null);
                 }
                 //or if the action array is 0 this means that the user has never typed anything in the box, and there is no history, in this case do nothing
-                else if(TextUtils.isEmpty(action.getText().toString()) && actionArray.size() == 0) {
+                else if (TextUtils.isEmpty(action.getText().toString()) && actionArray.size() == 0) {
                     addText.setText("Please type something in the text box above.");
+
                 } else {
                     String dropDownMenuText = actionMenu.getSelectedItem().toString();
-                    for(int i = 0; i < actionArray.size(); i = i + 1) {
-                        if(actionArray.get(i).equals(dropDownMenuText)) {
-                            //Firstly, we will increment the current value by one.
-                            int newActionCounter = actionCounter.get(i) + 1;
-                            //then we will set the current action counter to be this.
-                            actionCounter.set(i, newActionCounter);
 
-                            System.out.println("Action: " + actionArray.get(i) + " has been selected " + actionCounter.get(i) + " times");
+                    incrementArray(dropDownMenuText);
 
-                            break;
-                        }
-                    }
                     addText.setText("Action registered!");
                     System.out.println("Drop down menu: " + dropDownMenuText);
 
-                    Context context = MainActivity.this.getApplicationContext();
-                    TinyDB tinydb = new TinyDB(context);
-                    tinydb.putListInt("counter", actionCounter);
+                    //resetting the edit text.
+                    action.setText(null);
 
                 }
             }
+
         });
     }
 
@@ -186,11 +181,59 @@ public class MainActivity extends AppCompatActivity {
             public void run()
             {
                 //code that runs when timer is done
+                //showing the notification.
                 showNotification();
+
+                //if, after an hour a hour the user has not chosen a new action, then we will choose the last action that was chosen.
+                //if the array size is 0 then the array is empty so don't do anyrhing.
+                if(getLastAction(1).equals(null)) {
+
+                }
+                //else there is something in the array so we will increment the last chosen item by one.
+                else {
+                    //incrementing the last action in the array.
+                    incrementArray(getLastAction(1));
+                }
+
                 //calling a method to reset the timer.
                 resetTimer();
             }
         }, millis);
+    }
+
+    //Getting the a specific integer in the array (1 being the last, 2 being the second 2 last etc.) and returning it to be used elsewhere.
+    private String getLastAction(int arraySelector) {
+
+        //if there is currently nothing in the array, then we will return null to save errors.
+        if(actionArray.size() == 0) {
+            return null;
+        } else {
+            System.out.println("last action was: " + actionArray.get(actionArray.size() - arraySelector));
+            //returning the last element in the array.
+            return actionArray.get(actionArray.size() - arraySelector);
+        }
+
+    }
+
+
+    //method that compares 2 integers (1 from the input, 1 from the action array) and increments the corresponding element in actionCounter
+    private void incrementArray(String actionInput) {
+        for(int i = 0; i < actionArray.size(); i = i + 1) {
+            if (actionArray.get(i).equals(actionInput)) {
+                //Firstly, we will increment the current value by one.
+                int newActionCounter = actionCounter.get(i) + 1;
+                //then we will set the current action counter to be this.
+                actionCounter.set(i, newActionCounter);
+
+                System.out.println("Action: " + actionArray.get(i) + " has been selected " + actionCounter.get(i) + " times");
+
+                break;
+            }
+        }
+
+        Context context = MainActivity.this.getApplicationContext();
+        TinyDB tinydb = new TinyDB(context);
+        tinydb.putListInt("counter", actionCounter);
     }
 
     //Method thats only job is to recall startCountdown after the timer has finished.
