@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
     //an int arrayList that will keep track of how many times each action has been chosen.
     ArrayList<Integer> actionCounter = new ArrayList<Integer>();
 
-
+    //BOOL WHICH DETERMINES IF THE BUTTON HAS BEEN PRESSED OR NOT,.
+    public boolean confirmButtonPressed = false;
 
     TextView addText;
     Spinner actionMenu;
@@ -89,6 +90,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 System.out.println(action.getText().toString());
                 showNotification();
+
+                //The confirm button has been pressed so change this to true; this will stop the last element being updated when we have already chosen an update for the hour.
+                confirmButtonPressed = true;
 
                 //a boolean which will return true at the end of the array if there is no element that contrains the same string.
                 boolean notDuplicate = false;
@@ -157,6 +161,9 @@ public class MainActivity extends AppCompatActivity {
                     addText.setText("Action registered!");
                     System.out.println("Drop down menu: " + dropDownMenuText);
 
+                    //rearranging the array so we know that dropDownMenuText was the last element selected.
+                    rearrangeArray(dropDownMenuText);
+
                     //resetting the edit text.
                     action.setText(null);
 
@@ -184,15 +191,18 @@ public class MainActivity extends AppCompatActivity {
                 //showing the notification.
                 showNotification();
 
-                //if, after an hour a hour the user has not chosen a new action, then we will choose the last action that was chosen.
-                //if the array size is 0 then the array is empty so don't do anyrhing.
-                if(getLastAction(1).equals(null)) {
+                //only do the following if the confirm button has not been pressed.
+                if(confirmButtonPressed == false) {
+                    //if, after an hour a hour the user has not chosen a new action, then we will choose the last action that was chosen.
+                    //if the array size is 0 then the array is empty so don't do anyrhing.
+                    if (getLastAction(1).equals(null)) {
 
-                }
-                //else there is something in the array so we will increment the last chosen item by one.
-                else {
-                    //incrementing the last action in the array.
-                    incrementArray(getLastAction(1));
+                    }
+                    //else there is something in the array so we will increment the last chosen item by one.
+                    else {
+                        //incrementing the last action in the array.
+                        incrementArray(getLastAction(1));
+                    }
                 }
 
                 //calling a method to reset the timer.
@@ -212,6 +222,44 @@ public class MainActivity extends AppCompatActivity {
             //returning the last element in the array.
             return actionArray.get(actionArray.size() - arraySelector);
         }
+
+    }
+
+    //a method that rearranges the actionArray ArrayList (and counterArray ArrayList), and have it so the selected elements are at the end.
+    private void rearrangeArray(String actionInput) {
+
+        //integer for the current value of counterArray(i) so we can add it to the end of the ArrayList.
+        int currCounter;
+        //value for the current value of actionArray(i) so we can add it to the end of the arrayList.
+        String currAction;
+
+        //looping through the actionArray ArrayList.
+        for(int i = 0; i < actionArray.size(); i = i + 1) {
+            //if the actionArray and the input are identical we will 1. assing
+            if (actionArray.get(i).equals(actionInput)) {
+                //setting currCounter to be the current value of counterArray.
+                currCounter = actionCounter.get(i);
+
+                //setting currAction to be the current value of actionArray.
+                currAction = actionArray.get(i);
+
+                //removing the selected elements from the arrays.
+                actionCounter.remove(i);
+                actionArray.remove(i);
+                //readding them at the end.
+                actionCounter.add(currCounter);
+                actionArray.add(currAction);
+
+                System.out.println("Action: " + actionArray.get(actionArray.size() - 1) + " was moved to end with value: " + actionCounter.get(actionCounter.size() - 1) + " times");
+
+                break;
+            }
+        }
+
+        Context context = MainActivity.this.getApplicationContext();
+        TinyDB tinydb = new TinyDB(context);
+        tinydb.putListInt("counter", actionCounter);
+        tinydb.putListString("actions", actionArray);
 
     }
 
@@ -238,6 +286,8 @@ public class MainActivity extends AppCompatActivity {
 
     //Method thats only job is to recall startCountdown after the timer has finished.
     private void resetTimer() {
+        //reset the button as it is a new hour and we don't know if the button has been pressed yet.
+        confirmButtonPressed = false;
         startCountdown();
     }
 
