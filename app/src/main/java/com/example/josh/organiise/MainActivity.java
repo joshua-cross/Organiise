@@ -49,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
     //text view array for the 5 actions.
     TextView[] actionText = new TextView[5];
 
+    //array which will hold 5 buttons to edit each bit of the text.
+    Button[] editButtons = new Button[5];
+
 
     //the array that's needed for the Spinner.
     ArrayAdapter<String> spinnerArray;
@@ -83,6 +86,11 @@ public class MainActivity extends AppCompatActivity {
         actionText[3] = (TextView) findViewById((R.id.previousAction3));
         actionText[4] = (TextView) findViewById((R.id.previousAction4));
 
+        editButtons[0] = (Button) findViewById((R.id.previousButton));
+        editButtons[1] = (Button) findViewById((R.id.previousButton1));
+        editButtons[2] = (Button) findViewById((R.id.previousButton2));
+        editButtons[3] = (Button) findViewById((R.id.previousButton3));
+        editButtons[4] = (Button) findViewById((R.id.previousButton4));
 
 
 
@@ -202,6 +210,62 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
+
+        //if the first edit button has been clicked.
+        editButtons[0].setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                editPressed(0);
+
+                drawPrevious();
+
+
+            }
+        });
+        //if the second edit button has been clicked.
+        editButtons[1].setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                editPressed(1);
+
+
+                drawPrevious();
+
+
+            }
+        });
+        //if the third edit button has been clicked.
+        editButtons[2].setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                editPressed(2);
+
+
+                drawPrevious();
+
+            }
+        });
+        //if the second forth button has been clicked.
+        editButtons[3].setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                editPressed(3);
+
+                drawPrevious();
+
+            }
+        });
+        //if the second fifth button has been clicked.
+        editButtons[4].setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                editPressed(4);
+
+
+                drawPrevious();
+
+            }
+        });
+
     }
 
     //TO-DO: need a timer for every day/week/month to show the pie chart, this will need a new notification menu aswell...
@@ -284,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
         //ADD the tinyDB here.
         Context context = MainActivity.this.getApplicationContext();
         TinyDB tinydb = new TinyDB(context);
-        tinydb.putListString("previous", actionArray);
+        tinydb.putListString("previous", previousActions);
 
         drawPrevious();
 
@@ -393,6 +457,81 @@ public class MainActivity extends AppCompatActivity {
         startCountdown();
     }
 
+    private void editPressed(int buttonNumber) {
+
+        System.out.println("Edit: Button: " + buttonNumber + " has been selected");
+        //if the text box is not empty.
+        if (!TextUtils.isEmpty(action.getText().toString())) {
+
+            //getting what was typed in the text box.
+            String currAction = action.getText().toString();
+
+            //boolean that checks if the new edit is a new string.
+            boolean isNew = false;
+
+            //finding the
+
+            //looping through the actionArray to find the selected item.
+            for (int i = 0; i < actionArray.size(); i = i + 1) {
+                //if this is not a new string then we will declare isNew as false.
+                if (actionArray.get(i).equals(previousActions.get(buttonNumber))) {
+                    System.out.println("Edit: Action: " + previousActions.get(buttonNumber) + " already exists");
+                    //if this was the only example of this action in the array, then remove it.
+                    if (actionCounter.get(i) <= 1) {
+                        System.out.println("Edit: Action: " + previousActions.get(buttonNumber) + " already exists, removing.");
+                        actionCounter.remove(i);
+                        actionArray.remove(i);
+                    } else {
+                        //the new value for the counter.
+                        int newVal = actionCounter.get(i) - 1;
+                        //taking 1 away from this action, as we have no longer did this.
+                        actionCounter.set(i, newVal);
+                        System.out.println("Edit: EDITED - actionCounter: " + i + " to: " + actionCounter.get(i));
+                    }
+
+                    //after we have either taken 1 away, or deleted the old value.
+                    //then loop through actionArray again and find the newly entered action.
+                    for (int x = 0; x < actionArray.size(); x = x + 1) {
+                        //if the action i equals what was typed in the textbox.
+                        if (actionArray.get(x).equals(currAction)) {
+                            System.out.println("Edit: Action: " + currAction + " already exists.");
+                            isNew = false;
+                            //adding 1 to the edited action.
+                            int newVal = actionCounter.get(x) + 1;
+                            actionCounter.set(x, newVal);
+                            //setting whichever button it is to the new value.
+                            previousActions.set(buttonNumber, currAction);
+                            System.out.println("Edit: EDITED + actionCounter: " + x + " to: " + actionCounter.get(x));
+
+                            break;
+                        } else {
+                            isNew = true;
+                        }
+                    }
+
+                    //if after coming out of that for loop we see that the info from the textbox is new, we will add this to the array..
+                    if (isNew) {
+                        System.out.println("Edit: Action: " + currAction + " is new.");
+                        actionArray.add(currAction);
+                        actionCounter.add(1);
+                        //setting whichever button it is to the new value.
+                        previousActions.set(buttonNumber, currAction);
+
+                    }
+
+                    break;
+                }
+
+            }
+
+        }
+
+        Context context = MainActivity.this.getApplicationContext();
+        TinyDB tinydb = new TinyDB(context);
+        tinydb.putListString("actions", actionArray);
+        tinydb.putListInt("counter", actionCounter);
+        tinydb.putListString("previous", previousActions);
+    }
 
     //function that prints the notifications, this will be printed every hour.
     public void showNotification() {
