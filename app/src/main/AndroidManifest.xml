@@ -16,6 +16,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".DailyChart"
+            android:label="@string/title_activity_daily_chart"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <service
+            android:name=".Actions"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

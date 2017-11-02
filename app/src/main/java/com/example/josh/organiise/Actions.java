@@ -1,45 +1,27 @@
 package com.example.josh.organiise;
 
-//TODO: make all he background stuff e.g. the activity array into a service so it can be run in the background.
-
-import java.time.LocalTime;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.*;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.*;
-import java.text.ParseException;
-
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import android.text.TextUtils;
+import android.app.Service;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
-import android.content.SharedPreferences;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.graphics.BitmapFactory;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.content.res.Resources;
-//import that's needed for the input boxes.
+import android.os.Handler;
+import android.os.IBinder;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Spinner;
-//import needed for button
 import android.widget.Button;
-//importing the intent.
-import android.content.Intent;
-public class MainActivity extends AppCompatActivity {
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+public class Actions extends Service {
+
 
     EditText action;
     //A string ArrayList which will save all the unquie actions that the user has saved to the phone..
@@ -50,18 +32,6 @@ public class MainActivity extends AppCompatActivity {
 
     //BOOL WHICH DETERMINES IF THE BUTTON HAS BEEN PRESSED OR NOT,.
     public boolean confirmButtonPressed = false;
-
-    TextView addText;
-    Spinner actionMenu;
-
-    //text view array for the 5 actions.
-    TextView[] actionText = new TextView[5];
-
-    //text view for the current time.
-    TextView Time;
-
-    //array which will hold 5 buttons to edit each bit of the text.
-    Button[] editButtons = new Button[5];
 
 
     //the array that's needed for the Spinner.
@@ -93,48 +63,19 @@ public class MainActivity extends AppCompatActivity {
     //TODO: add button that makes user wakeup/sleep variables equal to a time of there choosing
     int userWake;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    //to be called when the application loads.
+    protected void onLoad() {
 
-        startCountdown();
         secondCounter();
 
-        //creating a reference to the ACTION input.
-        action = (EditText) findViewById(R.id.currentAction);
 
-        //the text that tells the user if the data was added.
-        addText = (TextView) findViewById(R.id.Add);
-
-        //the drop down menus for the actions.
-        actionMenu = (Spinner) findViewById(R.id.ActionMenu);
-
-        //setting the actions array.
-        actionText[0] = (TextView) findViewById((R.id.previousAction));
-        actionText[1] = (TextView) findViewById((R.id.PreviousAction1));
-        actionText[2] = (TextView) findViewById((R.id.previousAction2));
-        actionText[3] = (TextView) findViewById((R.id.previousAction3));
-        actionText[4] = (TextView) findViewById((R.id.previousAction4));
-
-        editButtons[0] = (Button) findViewById((R.id.previousButton));
-        editButtons[1] = (Button) findViewById((R.id.previousButton1));
-        editButtons[2] = (Button) findViewById((R.id.previousButton2));
-        editButtons[3] = (Button) findViewById((R.id.previousButton3));
-        editButtons[4] = (Button) findViewById((R.id.previousButton4));
-
-
-        Time = (TextView) findViewById((R.id.Time));
-
-
-        Context context = MainActivity.this.getApplicationContext();
+        Context context = Actions.this.getApplicationContext();
         TinyDB tinydb = new TinyDB(context);
 
 
         if(tinydb.getListString("actions").size() != 0) {
             actionArray = tinydb.getListString("actions");
             spinnerArray = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, actionArray);
-            actionMenu.setAdapter(spinnerArray);
         }
 
         if(tinydb.getListInt("counter").size() != 0) {
@@ -217,157 +158,8 @@ public class MainActivity extends AppCompatActivity {
             yYear = tinydb.getInt("yearYear");
         }
 
-            //setting the previousText boxes initially.
-        drawPrevious();
-
-
-        //reference to the button which will submit the action.
-        Button sumbitAction = (Button) findViewById(R.id.submitAction);
-        sumbitAction.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                System.out.println(action.getText().toString());
-                showNotification();
-
-                //The confirm button has been pressed so change this to true; this will stop the last element being updated when we have already chosen an update for the hour.
-                confirmButtonPressed = true;
-
-                //a boolean which will return true at the end of the array if there is no element that contrains the same string.
-                boolean notDuplicate = false;
-
-                //Have to add this as we do not go around the for loop with an empty array...
-                if (actionArray.size() == 0) {
-                    notDuplicate = true;
-                }
-
-                String currentAction = action.getText().toString();
-
-                //only do this if the user has not left the box blank.
-                if (!TextUtils.isEmpty(action.getText().toString())) {
-                    //checking to see if the action that we are trying to add is already in the array.
-                    for (int i = 0; i < actionArray.size(); i = i + 1) {
-
-                        //setting this to true each tick as we have not yet compared.
-                        notDuplicate = true;
-                        //comparing the current element with what has been enteTesred by the user.
-                        if (actionArray.get(i).equals(currentAction)) {
-                            //if it is a duplicate then we will set notDuplicate to false, and get out of the for loop so we don't accidently set it to true.
-                            notDuplicate = false;
-                            //this is where we will increase the count for this element.
-                            //Firstly, we will increment the current value by one.
-                            int newActionCounter = actionCounter.get(i) + 1;
-                            //then we will set the current action counter to be this.
-                            actionCounter.set(i, newActionCounter);
-
-                            //setting one of the previous actions.
-                            setPreviousActions(actionArray.get(i));
-
-                            //making the application tell you that the element is already present so the user knows to use the drop down meny instead, THIS IS NOT FINAL! we will increment instead in the future.
-                            addText.setText("Action already entered. Please use drop down menu!");
-                            System.out.println("Action: " + actionArray.get(i) + " has been selected " + actionCounter.get(i) + " times");
-                            //getting out the for loop early.
-                            break;
-                        }
-                    }
-
-                    if (notDuplicate) {
-                        actionArray.add(action.getText().toString());
-                        //informing the user that there action has been registered to the array.
-                        addText.setText("Action registered!");
-
-                        setPreviousActions(action.getText().toString());
-
-
-                        actionCounter.add(1);
-
-                        System.out.println("New element detected...");
-                    }
-
-                    Context context = MainActivity.this.getApplicationContext();
-                    TinyDB tinydb = new TinyDB(context);
-                    tinydb.putListString("actions", actionArray);
-                    tinydb.putListInt("counter", actionCounter);
-
-                    //resetting the edit text.
-                    action.setText(null);
-                }
-                //or if the action array is 0 this means that the user has never typed anything in the box, and there is no history, in this case do nothing
-                else if (TextUtils.isEmpty(action.getText().toString()) && actionArray.size() == 0) {
-                    addText.setText("Please type something in the text box above.");
-
-                } else {
-                    String dropDownMenuText = actionMenu.getSelectedItem().toString();
-
-                    incrementArray(dropDownMenuText);
-
-                    addText.setText("Action registered!");
-                    System.out.println("Drop down menu: " + dropDownMenuText);
-
-                    //rearranging the array so we know that dropDownMenuText was the last element selected.
-                    rearrangeArray(dropDownMenuText);
-                    setPreviousActions(dropDownMenuText);
-
-                    //resetting the edit text.
-                    action.setText(null);
-
-                }
-            }
-
-        });
-
-        //if the first edit button has been clicked.
-        editButtons[0].setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                editPressed(0);
-
-                drawPrevious();
-
-
-            }
-        });
-        //if the second edit button has been clicked.
-        editButtons[1].setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                editPressed(1);
-
-
-                drawPrevious();
-
-
-            }
-        });
-        //if the third edit button has been clicked.
-        editButtons[2].setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                editPressed(2);
-
-
-                drawPrevious();
-
-            }
-        });
-        //if the second forth button has been clicked.
-        editButtons[3].setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-
-                editPressed(3);
-
-                drawPrevious();
-
-            }
-        });
-        //if the second fifth button has been clicked.
-        editButtons[4].setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                editPressed(4);
-
-
-                drawPrevious();
-
-            }
-        });
+        //setting the previousText boxes initially.
+        //drawPrevious();
 
     }
 
@@ -421,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
                 //TODO: charts for both yearly, and monthly.
                 //checking to see if it's been a year after we first used the application.
                 if(now.after(year.getTime())) {
-                    Context context = MainActivity.this.getApplicationContext();
+                    Context context = Actions.this.getApplicationContext();
                     TinyDB tinydb = new TinyDB(context);
                     //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
                     Calendar cal = Calendar.getInstance();
@@ -434,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if(now.after(month.getTime())) {
-                    Context context = MainActivity.this.getApplicationContext();
+                    Context context = Actions.this.getApplicationContext();
                     TinyDB tinydb = new TinyDB(context);
                     //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
                     Calendar cal = Calendar.getInstance();
@@ -461,8 +253,8 @@ public class MainActivity extends AppCompatActivity {
                 //if the time is currently the time before we go to sleep then do nothing.
                 if (now.before(cSleep.getTime())) {
                     //System.out.println("Before bed time");
-                //else if the time is whilst we are asleep we are going to check firstly, if we have slept before, if not we are going to add this to the array, and the previous actions so this happens
-                //whilst the user is asleep, and secondly, if we have already checked, if we do this continuously every second we are going to fill up the counterArray very quickly.
+                    //else if the time is whilst we are asleep we are going to check firstly, if we have slept before, if not we are going to add this to the array, and the previous actions so this happens
+                    //whilst the user is asleep, and secondly, if we have already checked, if we do this continuously every second we are going to fill up the counterArray very quickly.
                 } else if (now.after(cSleep.getTime()) && now.before(cWakeup.getTime())) {
                     //stopping the program from constantly adding 1 to sleep every second.
                     if(!isAsleep) {
@@ -481,57 +273,55 @@ public class MainActivity extends AppCompatActivity {
                                 //setting one of the previous actions.
                                 setPreviousActions(actionArray.get(i));
 
-                                    break;
-                                }
+                                break;
                             }
-
-                            if(!SleptBefore) {
-                                actionArray.add("sleep");
-                                //informing the user that there action has been registered to the array.
-                                addText.setText("Action registered!");
-                                setPreviousActions("sleep");
-                                actionCounter.add(1);
-                                System.out.println("New element detected...");
-                                SleptBefore = true;
-                            }
-
-                            Context context = MainActivity.this.getApplicationContext();
-                            TinyDB tinydb = new TinyDB(context);
-                            tinydb.putListString("actions", actionArray);
-                            tinydb.putListInt("counter", actionCounter);
-
                         }
-                    //else if the time is after we have slept we are going to recalculate the times, adding one to tomorrow, so we know when the next time the user will sleep is.
-                    } else if(now.after(cWakeup.getTime())) {
-                        System.out.println("Awoken!");
-                        Context context = MainActivity.this.getApplicationContext();
+
+                        if(!SleptBefore) {
+                            actionArray.add("sleep");
+                            setPreviousActions("sleep");
+                            actionCounter.add(1);
+                            System.out.println("New element detected...");
+                            SleptBefore = true;
+                        }
+
+                        Context context = Actions.this.getApplicationContext();
                         TinyDB tinydb = new TinyDB(context);
-                        isAsleep = false;
-                        midnight = false;
-                        //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
-                        Calendar cal = Calendar.getInstance();
-                        tMonth = cal.get(Calendar.MONTH);
-                        tDate = cal.get(Calendar.DATE) + 1;
-                        tToday = cal.get(Calendar.DATE);
-                        tYear = cal.get(Calendar.YEAR);
-                        tSleepHour = 23;
-                        tSleepMinute = 0;
-                        tSleepSecond = 0;
-                        tWakeHour = 07;
-                        tWakeMinute = 0;
-                        tWakeSecond = 0;
-                        //saving this to the tinydb.
-                        tinydb.putInt("todayMonth", tMonth);
-                        tinydb.putInt("tomorrowDate", tDate);
-                        tinydb.putInt("todayDate", tToday);
-                        tinydb.putInt("todayYear", tYear);
-                        tinydb.putInt("todaySleepHour", tSleepHour);
-                        tinydb.putInt("todaySleepMinute", tSleepMinute);
-                        tinydb.putInt("todaySleepSecond", tSleepSecond);
-                        tinydb.putInt("todayWakeSecond", tWakeSecond);
-                        tinydb.putInt("todayWakeMinute", tWakeMinute);
-                        tinydb.putInt("todayWakeHour", tWakeHour);
+                        tinydb.putListString("actions", actionArray);
+                        tinydb.putListInt("counter", actionCounter);
+
                     }
+                    //else if the time is after we have slept we are going to recalculate the times, adding one to tomorrow, so we know when the next time the user will sleep is.
+                } else if(now.after(cWakeup.getTime())) {
+                    System.out.println("Awoken!");
+                    Context context = Actions.this.getApplicationContext();
+                    TinyDB tinydb = new TinyDB(context);
+                    isAsleep = false;
+                    midnight = false;
+                    //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
+                    Calendar cal = Calendar.getInstance();
+                    tMonth = cal.get(Calendar.MONTH);
+                    tDate = cal.get(Calendar.DATE) + 1;
+                    tToday = cal.get(Calendar.DATE);
+                    tYear = cal.get(Calendar.YEAR);
+                    tSleepHour = 23;
+                    tSleepMinute = 0;
+                    tSleepSecond = 0;
+                    tWakeHour = 07;
+                    tWakeMinute = 0;
+                    tWakeSecond = 0;
+                    //saving this to the tinydb.
+                    tinydb.putInt("todayMonth", tMonth);
+                    tinydb.putInt("tomorrowDate", tDate);
+                    tinydb.putInt("todayDate", tToday);
+                    tinydb.putInt("todayYear", tYear);
+                    tinydb.putInt("todaySleepHour", tSleepHour);
+                    tinydb.putInt("todaySleepMinute", tSleepMinute);
+                    tinydb.putInt("todaySleepSecond", tSleepSecond);
+                    tinydb.putInt("todayWakeSecond", tWakeSecond);
+                    tinydb.putInt("todayWakeMinute", tWakeMinute);
+                    tinydb.putInt("todayWakeHour", tWakeHour);
+                }
 
 
                 resetTimerSecond();
@@ -540,55 +330,11 @@ public class MainActivity extends AppCompatActivity {
         }, millis);
     }
 
-
-    //TO-DO: need a timer for every day/week/month to show the pie chart, this will need a new notification menu aswell...
-
-    //timer that shows the user every hour that they need to input new data.
-    public void startCountdown()
-    {
-
-        //int millis = ((hours*60)+mins)*60000; // Need milliseconds to use Timer
-        int millis = 10000;
-
-
-        //Had to use handler instead of Java timer as this did not allow for the GUI to be updated.
-        Handler handler = new Handler();
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //code that runs when timer is done
-                //only send notifications if user is not asleep.
-                if(!isAsleep) {
-                    //showing the notifications
-                    showNotification();
-                }
-
-                //only do the following if the confirm button has not been pressed.
-                if(confirmButtonPressed == false) {
-                    //if, after an hour a hour the user has not chosen a new action, then we will choose the last action that was chosen.
-                    //if the array size is 0 then the array is empty so don't do anyrhing.
-                    if (getLastAction(1).equals(null)) {
-
-                    }
-                    //else there is something in the array so we will increment the last chosen item by one.
-                    else {
-
-                        String currLast = getLastAction(1);
-                        //incrementing the last action in the array.
-                        incrementArray(currLast);
-                        //setPreviousActions(currLast);
-                        setPreviousActions(currLast);
-                    }
-                }
-
-                //calling a method to reset the timer.
-                resetTimer();
-            }
-        }, millis);
+    @Override
+    public IBinder onBind(Intent intent) {
+        // TODO: Return the communication channel to the service.
+        throw new UnsupportedOperationException("Not yet implemented");
     }
-
-
 
     //Getting the a specific integer in the array (1 being the last, 2 being the second 2 last etc.) and returning it to be used elsewhere.
     private String getLastAction(int arraySelector) {
@@ -622,50 +368,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //ADD the tinyDB here.
-        Context context = MainActivity.this.getApplicationContext();
+        Context context = Actions.this.getApplicationContext();
         TinyDB tinydb = new TinyDB(context);
         tinydb.putListString("previous", previousActions);
 
-        drawPrevious();
+        //drawPrevious();
 
     }
 
-    private void drawPrevious() {
-
-        System.out.println("There are: " + previousActions.size() + " previous actions.");
-        int tmpSize = previousActions.size();
-
-        if(tmpSize == 1) {
-            actionText[0].setText(previousActions.get(0));
-        } else if (tmpSize == 2) {
-            actionText[0].setText(previousActions.get(0));
-            actionText[1].setText(previousActions.get(1));
-        } else if (tmpSize == 3) {
-            actionText[0].setText(previousActions.get(0));
-            actionText[1].setText(previousActions.get(1));
-            actionText[2].setText(previousActions.get(2));
-        } else if (tmpSize == 4) {
-            actionText[0].setText(previousActions.get(0));
-            actionText[1].setText(previousActions.get(1));
-            actionText[2].setText(previousActions.get(2));
-            actionText[3].setText(previousActions.get(3));
-        } else if(tmpSize == 5) {
-            actionText[0].setText(previousActions.get(0));
-            actionText[1].setText(previousActions.get(1));
-            actionText[2].setText(previousActions.get(2));
-            actionText[3].setText(previousActions.get(3));
-            actionText[4].setText(previousActions.get(4));
-        } else if (tmpSize > 5) {
-            actionText[0].setText(previousActions.get(0));
-            actionText[1].setText(previousActions.get(1));
-            actionText[2].setText(previousActions.get(2));
-            actionText[3].setText(previousActions.get(3));
-            actionText[4].setText(previousActions.get(4));
-        } else {
-            System.out.println("Not sure...");
-        }
-
-    }
 
     //a method that rearranges the actionArray ArrayList (and counterArray ArrayList), and have it so the selected elements are at the end.
     private void rearrangeArray(String actionInput) {
@@ -698,7 +408,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        Context context = MainActivity.this.getApplicationContext();
+        Context context = Actions.this.getApplicationContext();
         TinyDB tinydb = new TinyDB(context);
         tinydb.putListInt("counter", actionCounter);
         tinydb.putListString("actions", actionArray);
@@ -721,16 +431,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        Context context = MainActivity.this.getApplicationContext();
+        Context context = Actions.this.getApplicationContext();
         TinyDB tinydb = new TinyDB(context);
         tinydb.putListInt("counter", actionCounter);
-    }
-
-    //Method thats only job is to recall startCountdown after the timer has finished.
-    private void resetTimer() {
-        //reset the button as it is a new hour and we don't know if the button has been pressed yet.
-        confirmButtonPressed = false;
-        startCountdown();
     }
 
     public void resetTimerSecond() {
@@ -806,33 +509,11 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        Context context = MainActivity.this.getApplicationContext();
+        Context context = Actions.this.getApplicationContext();
         TinyDB tinydb = new TinyDB(context);
         tinydb.putListString("actions", actionArray);
         tinydb.putListInt("counter", actionCounter);
         tinydb.putListString("previous", previousActions);
-    }
-
-    //function that prints the notifications, this will be printed every hour.
-    public void showNotification() {
-
-        NotificationManager notificationmgr = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        Intent intent = new Intent(this, MainActivity.class);
-        PendingIntent pintent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
-
-        //   PendingIntent pintent = PendingIntent.getActivities(this,(int)System.currentTimeMillis(),intent, 0);
-
-
-        Notification notif = new Notification.Builder(this)
-                //the location of the icon.
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Hello Android Hari")
-                .setContentText("Welcome to Notification Service")
-                .setContentIntent(pintent)
-                .build();
-
-
-        notificationmgr.notify(0,notif);
     }
 
 }
