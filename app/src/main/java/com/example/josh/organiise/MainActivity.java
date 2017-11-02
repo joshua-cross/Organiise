@@ -85,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
     //boolean to check if the user has been asleep today.
     boolean isAsleep = false;
 
+    //boolean to check if we have already displayed the monthly graphs.
+    boolean midnight = false;
+
     //TODO: add button that makes user wakeup/sleep variables equal to a time of there choosing
     int userWake;
 
@@ -143,7 +146,29 @@ public class MainActivity extends AppCompatActivity {
 
         //checking if the daily times have a value. if they don't we will assign them a value here.
         if(tinydb.getInt("todayYear") == 0 && tinydb.getInt("todayMonth") == 0 && tinydb.getInt("todayDate") == 0) {
-
+            //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
+            Calendar cal = Calendar.getInstance();
+            tMonth = cal.get(Calendar.MONTH);
+            tDate = cal.get(Calendar.DATE) + 1;
+            tToday = cal.get(Calendar.DATE);
+            tYear = cal.get(Calendar.YEAR);
+            tSleepHour = 23;
+            tSleepMinute = 0;
+            tSleepSecond = 0;
+            tWakeHour = 07;
+            tWakeMinute = 0;
+            tWakeSecond = 0;
+            //saving this to the tinydb.
+            tinydb.putInt("todayMonth", tMonth);
+            tinydb.putInt("tomorrowDate", tDate);
+            tinydb.putInt("todayDate", tToday);
+            tinydb.putInt("todayYear", tYear);
+            tinydb.putInt("todaySleepHour", tSleepHour);
+            tinydb.putInt("todaySleepMinute", tSleepMinute);
+            tinydb.putInt("todaySleepSecond", tSleepSecond);
+            tinydb.putInt("todayWakeSecond", tWakeSecond);
+            tinydb.putInt("todayWakeMinute", tWakeMinute);
+            tinydb.putInt("todayWakeHour", tWakeHour);
         }
         //else they have already been given a value.
         else {
@@ -159,7 +184,38 @@ public class MainActivity extends AppCompatActivity {
             tWakeHour = tinydb.getInt("todayWakeHour");
         }
 
-        //setting the previousText boxes initially.
+        //if we have not yet set the date of the next month.
+        if (tinydb.getInt("monthYear") == 0 && tinydb.getInt("monthMonth") == 0 && tinydb.getInt("monthDate") == 0) {
+            //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
+            Calendar cal = Calendar.getInstance();
+            mMonth = cal.get(Calendar.MONTH) + 1;
+            mYear = cal.get(Calendar.YEAR);
+            mDate = cal.get(Calendar.DATE);
+            tinydb.putInt("monthMonth", mMonth);
+            tinydb.putInt("monthDate", mDate);
+            tinydb.putInt("monthYear", mYear);
+        } else {
+            mMonth = tinydb.getInt("monthMonth");
+            mDate = tinydb.getInt("monthDate");
+            mYear = tinydb.getInt("monthYear");
+        }
+
+        if (tinydb.getInt("yearYear") == 0 && tinydb.getInt("yearMonth") == 0 && tinydb.getInt("yearDate") == 0) {
+            //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
+            Calendar cal = Calendar.getInstance();
+            yMonth = cal.get(Calendar.MONTH);
+            yYear = cal.get(Calendar.YEAR) + 1;
+            yDate = cal.get(Calendar.DATE);
+            tinydb.putInt("yearMonth", yMonth);
+            tinydb.putInt("yearDate", yDate);
+            tinydb.putInt("yearYear", yYear);
+        } else {
+            yMonth = tinydb.getInt("yearMonth");
+            yDate = tinydb.getInt("yearDate");
+            yYear = tinydb.getInt("yearYear");
+        }
+
+            //setting the previousText boxes initially.
         drawPrevious();
 
 
@@ -328,42 +384,100 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-                try {
+                //a calender for when we will wake up.
+                Calendar cWakeup = Calendar.getInstance();
+                cWakeup.set(tYear, tMonth, tDate, tWakeHour, tWakeMinute, tWakeSecond);
 
-                    Calendar cWakeup = Calendar.getInstance();
-                    cWakeup.set(tYear, tMonth, tDate, tWakeHour, tWakeMinute, tWakeSecond);
+                //a calendar for when we go to sleep.
+                Calendar cSleep = Calendar.getInstance();
+                cSleep.set(tYear, tMonth, tToday, tSleepHour, tSleepMinute, tSleepSecond);
 
-                    Calendar cSleep = Calendar.getInstance();
-                    cSleep.set(tYear, tMonth, tToday, tSleepHour, tSleepMinute, tSleepSecond);
+                //a calendar for midnight so we can create a chart for the user.
+                Calendar midnightAfter = Calendar.getInstance();
+                midnightAfter.set(tYear, tMonth,tDate, 00, 00, 00);
 
-                    Date now = new Date();
-                    System.out.println(now);
+                // a second calendar for midnight so we can check if it is between the 2 midnight times.
+                Calendar midnightBefore = Calendar.getInstance();
+                midnightBefore.set(tYear, tMonth, tDate, 00, 05, 00);
 
-                    //System.out.println("Wake: " + cWakeup.getTime());
-                    //System.out.println("Sleep: " + cSleep.getTime());
-                    //System.out.println("now: " + now);
+                Calendar month = Calendar.getInstance();
+                month.set(mYear, mMonth, mDate, 00, 00, 00);
 
-                    if (now.before(cSleep.getTime())) {
-                        System.out.println("Before bed time");
-                    } else if (now.after(cSleep.getTime()) && now.before(cWakeup.getTime())) {
-                        //stopping the program from constantly adding 1 to sleep every second.
-                        if(!isAsleep) {
-                            System.out.println("Asleep. ZZZ");
-                            isAsleep = true;
-                            //boolean that checks if the user has used the app whilst he/she has slept before.
-                            boolean SleptBefore = false;
-                            for(int i = 0; i < actionArray.size(); i = i + 1) {
-                                //if sleep is already an action, then we do not want to add it..
-                                if(actionArray.get(i) == "sleep") {
-                                    //we have slept before so do not go into the if statement below.
-                                    SleptBefore = true;
+                Calendar year = Calendar.getInstance();
+                year.set(yYear, yMonth, yDate, 00, 00, 00);
 
-                                    int newActionCounter = actionCounter.get(i) + 1;
-                                    //then we will set the current action counter to be this.
-                                    actionCounter.set(i, newActionCounter);
+                Date now = new Date();
+                System.out.println(now);
 
-                                    //setting one of the previous actions.
-                                    setPreviousActions(actionArray.get(i));
+                System.out.println("Wake: " + cWakeup.getTime());
+                System.out.println("Sleep: " + cSleep.getTime());
+                System.out.println("now: " + now);
+                System.out.println("month: " + month.getTime());
+                System.out.println("year: " + year.getTime());
+
+
+                //TODO: charts for both yearly, and monthly.
+                //checking to see if it's been a year after we first used the application.
+                if(now.after(year.getTime())) {
+                    Context context = MainActivity.this.getApplicationContext();
+                    TinyDB tinydb = new TinyDB(context);
+                    //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
+                    Calendar cal = Calendar.getInstance();
+                    yMonth = cal.get(Calendar.MONTH);
+                    yYear = cal.get(Calendar.YEAR) + 1;
+                    yDate = cal.get(Calendar.DATE);
+                    tinydb.putInt("yearMonth", yMonth);
+                    tinydb.putInt("yearDate", yDate);
+                    tinydb.putInt("yearYear", yYear);
+                }
+
+                if(now.after(month.getTime())) {
+                    Context context = MainActivity.this.getApplicationContext();
+                    TinyDB tinydb = new TinyDB(context);
+                    //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
+                    Calendar cal = Calendar.getInstance();
+                    mMonth = cal.get(Calendar.MONTH) + 1;
+                    mYear = cal.get(Calendar.YEAR);
+                    mDate = cal.get(Calendar.DATE);
+                    tinydb.putInt("monthMonth", mMonth);
+                    tinydb.putInt("monthDate", mDate);
+                    tinydb.putInt("monthYear", mYear);
+                }
+
+
+                //Checking if the time is midnight so we can display the users daily graphs.
+                if(now.before(midnightBefore.getTime()) && now.after(midnightAfter.getTime())) {
+                    //checking to see if we have displayed the graphs to the user before.
+                    if(!midnight) {
+                        midnight = true;
+                        //TODO: create notification here.
+
+                        //TODO: link to graph here
+                    }
+                }
+
+                //if the time is currently the time before we go to sleep then do nothing.
+                if (now.before(cSleep.getTime())) {
+                    //System.out.println("Before bed time");
+                //else if the time is whilst we are asleep we are going to check firstly, if we have slept before, if not we are going to add this to the array, and the previous actions so this happens
+                //whilst the user is asleep, and secondly, if we have already checked, if we do this continuously every second we are going to fill up the counterArray very quickly.
+                } else if (now.after(cSleep.getTime()) && now.before(cWakeup.getTime())) {
+                    //stopping the program from constantly adding 1 to sleep every second.
+                    if(!isAsleep) {
+                        //System.out.println("Asleep. ZZZ");
+                        isAsleep = true;
+                        //boolean that checks if the user has used the app whilst he/she has slept before.
+                        boolean SleptBefore = false;
+                        for(int i = 0; i < actionArray.size(); i = i + 1) {
+                            //if sleep is already an action, then we do not want to add it..
+                            if(actionArray.get(i) == "sleep") {
+                                //we have slept before so do not go into the if statement below.
+                                SleptBefore = true;
+                                int newActionCounter = actionCounter.get(i) + 1;
+                                //then we will set the current action counter to be this.
+                                actionCounter.set(i, newActionCounter);
+                                //setting one of the previous actions.
+                                setPreviousActions(actionArray.get(i));
 
                                     break;
                                 }
@@ -373,12 +487,8 @@ public class MainActivity extends AppCompatActivity {
                                 actionArray.add("sleep");
                                 //informing the user that there action has been registered to the array.
                                 addText.setText("Action registered!");
-
                                 setPreviousActions("sleep");
-
-
                                 actionCounter.add(1);
-
                                 System.out.println("New element detected...");
                                 SleptBefore = true;
                             }
@@ -389,89 +499,38 @@ public class MainActivity extends AppCompatActivity {
                             tinydb.putListInt("counter", actionCounter);
 
                         }
+                    //else if the time is after we have slept we are going to recalculate the times, adding one to tomorrow, so we know when the next time the user will sleep is.
                     } else if(now.after(cWakeup.getTime())) {
                         System.out.println("Awoken!");
-                        if(isAsleep) {
-                            Context context = MainActivity.this.getApplicationContext();
-                            TinyDB tinydb = new TinyDB(context);
-                            isAsleep = false;
-                            //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
-                            Calendar cal = Calendar.getInstance();
-                            tMonth = cal.get(Calendar.MONTH);
-                            tDate = cal.get(Calendar.DATE) + 1;
-                            tToday = cal.get(Calendar.DATE);
-                            tYear = cal.get(Calendar.YEAR);
-                            tSleepHour = 23;
-                            tSleepMinute = 0;
-                            tSleepSecond = 0;
-                            tWakeHour = 07;
-                            tWakeMinute = 0;
-                            tWakeSecond = 0;
-                            //saving this to the tinydb.
-                            tinydb.putInt("todayMonth", tMonth);
-                            tinydb.putInt("tomorrowDate", tDate);
-                            tinydb.putInt("todayDate", tToday);
-                            tinydb.putInt("todayYear", tYear);
-                            tinydb.putInt("todaySleepHour", tSleepHour);
-                            tinydb.putInt("todaySleepMinute", tSleepMinute);
-                            tinydb.putInt("todaySleepSecond", tSleepSecond);
-                            tinydb.putInt("todayWakeSecond", tWakeSecond);
-                            tinydb.putInt("todayWakeMinute", tWakeMinute);
-                            tinydb.putInt("todayWakeHour", tWakeHour);
-                        }
+                        Context context = MainActivity.this.getApplicationContext();
+                        TinyDB tinydb = new TinyDB(context);
+                        isAsleep = false;
+                        midnight = false;
+                        //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
+                        Calendar cal = Calendar.getInstance();
+                        tMonth = cal.get(Calendar.MONTH);
+                        tDate = cal.get(Calendar.DATE) + 1;
+                        tToday = cal.get(Calendar.DATE);
+                        tYear = cal.get(Calendar.YEAR);
+                        tSleepHour = 23;
+                        tSleepMinute = 0;
+                        tSleepSecond = 0;
+                        tWakeHour = 07;
+                        tWakeMinute = 0;
+                        tWakeSecond = 0;
+                        //saving this to the tinydb.
+                        tinydb.putInt("todayMonth", tMonth);
+                        tinydb.putInt("tomorrowDate", tDate);
+                        tinydb.putInt("todayDate", tToday);
+                        tinydb.putInt("todayYear", tYear);
+                        tinydb.putInt("todaySleepHour", tSleepHour);
+                        tinydb.putInt("todaySleepMinute", tSleepMinute);
+                        tinydb.putInt("todaySleepSecond", tSleepSecond);
+                        tinydb.putInt("todayWakeSecond", tWakeSecond);
+                        tinydb.putInt("todayWakeMinute", tWakeMinute);
+                        tinydb.putInt("todayWakeHour", tWakeHour);
                     }
 
-                    //converting tomorrow to a String.
-                    //String sTomorrow = cWakeup.getTime().toString();
-
-                    //System.out.println(sTomorrow);
-                    //cWakeup.setTime(time1);
-
-                    /*
-                    String sSleep = "18:00:00";
-                    Date time2 = new SimpleDateFormat("HH:mm:ss").parse(sSleep);
-                    Calendar cSleep = Calendar.getInstance();
-                    cSleep.setTime(time2);
-
-
-                    */
-
-                    DateFormat times = new SimpleDateFormat("HH:mm:ss");
-                    Date sleep = times.parse("12:00:00");
-                    Date wake = times.parse("19:00:00");
-                    //Date now = new Date();
-
-                    DateFormat time1 = new SimpleDateFormat("YYYY-MM-dd hh:mm:ss");
-                    String sSomeDay = time1.format(cWakeup.getTime());
-                    String testString = "2013-03-21 03:12:02";
-                    Date testDate = time1.parse(sSomeDay);
-                    Calendar cTest = Calendar.getInstance();
-                    cTest.setTime(testDate);
-
-                    //System.out.println("sSomeDay: " + sSomeDay);
-                    //Date aTime = time1.parse(sTomorrow);
-
-
-
-
-
-                    /*Date date; // your date
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(date);
-                    int year = cal.get(Calendar.YEAR);
-                    int month = cal.get(Calendar.MONTH);
-                    int day = cal.get(Calendar.DAY_OF_MONTH);
-                    */
-
-
-
-                    if (now.before(cWakeup.getTime())) {
-                        //checkes whether the current time is between 14:49:00 and 20:11:13.
-                        //System.out.println(cWakeup.getTimeInMillis());
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
 
                 resetTimerSecond();
             }
