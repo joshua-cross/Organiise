@@ -1,11 +1,17 @@
 package com.example.josh.organiise;
 
+import java.time.LocalTime;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.*;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.*;
+import java.text.ParseException;
+
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import android.text.TextUtils;
 import android.content.Context;
 import android.os.Handler;
@@ -49,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
     //text view array for the 5 actions.
     TextView[] actionText = new TextView[5];
 
+    //text view for the current time.
+    TextView Time;
+
     //array which will hold 5 buttons to edit each bit of the text.
     Button[] editButtons = new Button[5];
 
@@ -62,6 +71,22 @@ public class MainActivity extends AppCompatActivity {
     //ArrayList, which can hold 5 of the previous actions which will be displayed to the user.
     ArrayList<String> previousActions = new ArrayList<String>();
 
+    //integers for the times that we assume the user is sleeping (will be stored in a tinyDB).
+    int tDate, tToday, tYear, tMonth, tSleepHour, tSleepMinute, tSleepSecond, tWakeHour, tWakeMinute, tWakeSecond;
+    //the time the daily chart will appear.
+    int tChartHour, tChartMinute, tChartSecond;
+
+    //integers for when the monthly chart will show up.
+    int mYear, mMonth, mDate, mHour, mMinute, mSecond;
+
+    //integers for when the yearly chart will show up.
+    int yYear, yMonth, yDate, yHour, yMinute, ySecond;
+
+    //boolean to check if the user has been asleep today.
+    boolean isAsleep = false;
+
+    //TODO: add button that makes user wakeup/sleep variables equal to a time of there choosing
+    int userWake;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         startCountdown();
+        secondCounter();
 
         //creating a reference to the ACTION input.
         action = (EditText) findViewById(R.id.currentAction);
@@ -93,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         editButtons[4] = (Button) findViewById((R.id.previousButton4));
 
 
-
+        Time = (TextView) findViewById((R.id.Time));
 
 
         Context context = MainActivity.this.getApplicationContext();
@@ -112,6 +138,25 @@ public class MainActivity extends AppCompatActivity {
 
         if(tinydb.getListString("previous").size() != 0) {
             previousActions = tinydb.getListString("previous");
+        }
+
+
+        //checking if the daily times have a value. if they don't we will assign them a value here.
+        if(tinydb.getInt("todayYear") == 0 && tinydb.getInt("todayMonth") == 0 && tinydb.getInt("todayDate") == 0) {
+
+        }
+        //else they have already been given a value.
+        else {
+            tYear = tinydb.getInt("todayYear");
+            tMonth = tinydb.getInt("todayMonth");
+            tDate = tinydb.getInt("tomorrowDate");
+            tToday = tinydb.getInt("todayDate");
+            tSleepHour = tinydb.getInt("todaySleepHour");
+            tSleepMinute = tinydb.getInt("todaySleepMinute");
+            tSleepSecond = tinydb.getInt("todaySleepSecond");
+            tWakeSecond = tinydb.getInt("todayWakeSecond");
+            tWakeMinute = tinydb.getInt("todayWakeMinute");
+            tWakeHour = tinydb.getInt("todayWakeHour");
         }
 
         //setting the previousText boxes initially.
@@ -171,18 +216,18 @@ public class MainActivity extends AppCompatActivity {
                         //informing the user that there action has been registered to the array.
                         addText.setText("Action registered!");
 
-                        Context context = MainActivity.this.getApplicationContext();
                         setPreviousActions(action.getText().toString());
 
 
                         actionCounter.add(1);
 
-                        TinyDB tinydb = new TinyDB(context);
-                        tinydb.putListString("actions", actionArray);
-                        tinydb.putListInt("counter", actionCounter);
-
                         System.out.println("New element detected...");
                     }
+
+                    Context context = MainActivity.this.getApplicationContext();
+                    TinyDB tinydb = new TinyDB(context);
+                    tinydb.putListString("actions", actionArray);
+                    tinydb.putListInt("counter", actionCounter);
 
                     //resetting the edit text.
                     action.setText(null);
@@ -268,6 +313,173 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //timer for every second so we can see if it's past sleep time.
+    public void secondCounter()
+    {
+
+        //int millis = ((hours*60)+mins)*60000; // Need milliseconds to use Timer
+        int millis = 1000;
+
+
+        //Had to use handler instead of Java timer as this did not allow for the GUI to be updated.
+        Handler handler = new Handler();
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+
+                    Calendar cWakeup = Calendar.getInstance();
+                    cWakeup.set(tYear, tMonth, tDate, tWakeHour, tWakeMinute, tWakeSecond);
+
+                    Calendar cSleep = Calendar.getInstance();
+                    cSleep.set(tYear, tMonth, tToday, tSleepHour, tSleepMinute, tSleepSecond);
+
+                    Date now = new Date();
+                    System.out.println(now);
+
+                    //System.out.println("Wake: " + cWakeup.getTime());
+                    //System.out.println("Sleep: " + cSleep.getTime());
+                    //System.out.println("now: " + now);
+
+                    if (now.before(cSleep.getTime())) {
+                        System.out.println("Before bed time");
+                    } else if (now.after(cSleep.getTime()) && now.before(cWakeup.getTime())) {
+                        //stopping the program from constantly adding 1 to sleep every second.
+                        if(!isAsleep) {
+                            System.out.println("Asleep. ZZZ");
+                            isAsleep = true;
+                            //boolean that checks if the user has used the app whilst he/she has slept before.
+                            boolean SleptBefore = false;
+                            for(int i = 0; i < actionArray.size(); i = i + 1) {
+                                //if sleep is already an action, then we do not want to add it..
+                                if(actionArray.get(i) == "sleep") {
+                                    //we have slept before so do not go into the if statement below.
+                                    SleptBefore = true;
+
+                                    int newActionCounter = actionCounter.get(i) + 1;
+                                    //then we will set the current action counter to be this.
+                                    actionCounter.set(i, newActionCounter);
+
+                                    //setting one of the previous actions.
+                                    setPreviousActions(actionArray.get(i));
+
+                                    break;
+                                }
+                            }
+
+                            if(!SleptBefore) {
+                                actionArray.add("sleep");
+                                //informing the user that there action has been registered to the array.
+                                addText.setText("Action registered!");
+
+                                setPreviousActions("sleep");
+
+
+                                actionCounter.add(1);
+
+                                System.out.println("New element detected...");
+                                SleptBefore = true;
+                            }
+
+                            Context context = MainActivity.this.getApplicationContext();
+                            TinyDB tinydb = new TinyDB(context);
+                            tinydb.putListString("actions", actionArray);
+                            tinydb.putListInt("counter", actionCounter);
+
+                        }
+                    } else if(now.after(cWakeup.getTime())) {
+                        System.out.println("Awoken!");
+                        if(isAsleep) {
+                            Context context = MainActivity.this.getApplicationContext();
+                            TinyDB tinydb = new TinyDB(context);
+                            isAsleep = false;
+                            //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
+                            Calendar cal = Calendar.getInstance();
+                            tMonth = cal.get(Calendar.MONTH);
+                            tDate = cal.get(Calendar.DATE) + 1;
+                            tToday = cal.get(Calendar.DATE);
+                            tYear = cal.get(Calendar.YEAR);
+                            tSleepHour = 23;
+                            tSleepMinute = 0;
+                            tSleepSecond = 0;
+                            tWakeHour = 07;
+                            tWakeMinute = 0;
+                            tWakeSecond = 0;
+                            //saving this to the tinydb.
+                            tinydb.putInt("todayMonth", tMonth);
+                            tinydb.putInt("tomorrowDate", tDate);
+                            tinydb.putInt("todayDate", tToday);
+                            tinydb.putInt("todayYear", tYear);
+                            tinydb.putInt("todaySleepHour", tSleepHour);
+                            tinydb.putInt("todaySleepMinute", tSleepMinute);
+                            tinydb.putInt("todaySleepSecond", tSleepSecond);
+                            tinydb.putInt("todayWakeSecond", tWakeSecond);
+                            tinydb.putInt("todayWakeMinute", tWakeMinute);
+                            tinydb.putInt("todayWakeHour", tWakeHour);
+                        }
+                    }
+
+                    //converting tomorrow to a String.
+                    //String sTomorrow = cWakeup.getTime().toString();
+
+                    //System.out.println(sTomorrow);
+                    //cWakeup.setTime(time1);
+
+                    /*
+                    String sSleep = "18:00:00";
+                    Date time2 = new SimpleDateFormat("HH:mm:ss").parse(sSleep);
+                    Calendar cSleep = Calendar.getInstance();
+                    cSleep.setTime(time2);
+
+
+                    */
+
+                    DateFormat times = new SimpleDateFormat("HH:mm:ss");
+                    Date sleep = times.parse("12:00:00");
+                    Date wake = times.parse("19:00:00");
+                    //Date now = new Date();
+
+                    DateFormat time1 = new SimpleDateFormat("YYYY-MM-dd hh:mm:ss");
+                    String sSomeDay = time1.format(cWakeup.getTime());
+                    String testString = "2013-03-21 03:12:02";
+                    Date testDate = time1.parse(sSomeDay);
+                    Calendar cTest = Calendar.getInstance();
+                    cTest.setTime(testDate);
+
+                    //System.out.println("sSomeDay: " + sSomeDay);
+                    //Date aTime = time1.parse(sTomorrow);
+
+
+
+
+
+                    /*Date date; // your date
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(date);
+                    int year = cal.get(Calendar.YEAR);
+                    int month = cal.get(Calendar.MONTH);
+                    int day = cal.get(Calendar.DAY_OF_MONTH);
+                    */
+
+
+
+                    if (now.before(cWakeup.getTime())) {
+                        //checkes whether the current time is between 14:49:00 and 20:11:13.
+                        //System.out.println(cWakeup.getTimeInMillis());
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                resetTimerSecond();
+            }
+
+        }, millis);
+    }
+
+
     //TO-DO: need a timer for every day/week/month to show the pie chart, this will need a new notification menu aswell...
 
     //timer that shows the user every hour that they need to input new data.
@@ -285,8 +497,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 //code that runs when timer is done
-                //showing the notification.
-                showNotification();
+                //only send notifications if user is not asleep.
+                if(!isAsleep) {
+                    //showing the notifications
+                    showNotification();
+                }
 
                 //only do the following if the confirm button has not been pressed.
                 if(confirmButtonPressed == false) {
@@ -455,6 +670,10 @@ public class MainActivity extends AppCompatActivity {
         //reset the button as it is a new hour and we don't know if the button has been pressed yet.
         confirmButtonPressed = false;
         startCountdown();
+    }
+
+    public void resetTimerSecond() {
+        secondCounter();
     }
 
     private void editPressed(int buttonNumber) {
