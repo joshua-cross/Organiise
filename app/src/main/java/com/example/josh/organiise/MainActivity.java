@@ -380,6 +380,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    /*
     @Override
     protected void onStop() {
         super.onStop();
@@ -388,6 +389,7 @@ public class MainActivity extends AppCompatActivity {
             mBounded = false;
         }
     };
+    */
 
 
 

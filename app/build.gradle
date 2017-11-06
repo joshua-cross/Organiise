@@ -27,3 +27,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     compile files('libs/gson-2.6.2.jar')
 }
+dependencies {
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
+}
