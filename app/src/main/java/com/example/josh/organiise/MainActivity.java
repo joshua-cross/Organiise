@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        updateUI();
+        //updateUI();
 
         Context context = MainActivity.this.getApplicationContext();
         /***** For start Service  ****/
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
         Button sumbitAction = (Button) findViewById(R.id.submitAction);
         sumbitAction.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                mServer.message();
+                //mServer.message();
                 System.out.println(action.getText().toString());
                 //showNotification();
 
@@ -268,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
         //if the chart page button has been pressed.
         chartPage.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent startChartPage = new Intent(MainActivity.this, DailyChart.class);
+                Intent startChartPage = new Intent(MainActivity.this, ChartDaily.class);
                 startActivity(startChartPage);
             }
         });
@@ -278,6 +278,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+        System.out.println("Started");
+
+
         Intent mIntent = new Intent(this, Actions.class);
         bindService(mIntent, mConnection, BIND_AUTO_CREATE);
     };
@@ -286,6 +305,23 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Toast.makeText(MainActivity.this, "Service is disconnected", 1000).show();
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
+            System.out.println("Not Working :(");
             mBounded = false;
             mServer = null;
         }
@@ -297,11 +333,30 @@ public class MainActivity extends AppCompatActivity {
             LocalBinder mLocalBinder = (LocalBinder)service;
             mServer = mLocalBinder.getServerInstance();
 
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+            System.out.println("Working!");
+
             Context context = MainActivity.this.getApplicationContext();
             //Context context = MainActivity.this.getApplicationContext();
             TinyDB tinydb = new TinyDB(context);
 
             //setContentView(R.layout.activity_main);
+            updateUI();
 
             //if there are some previous actions.
             if(mServer.getActionArray().size() != 0) {
@@ -388,16 +443,18 @@ public class MainActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                if(mServer.getActionCounter().size() != 0) {
 
-                actionArray = mServer.getActionArray();
-                previousActions = mServer.getPreviousActions();
-                //spinnerArray = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, actionArray);
-                //actionMenu.setAdapter(spinnerArray);
-                spinnerArray.notifyDataSetChanged();
-                drawPrevious();
+                    actionArray = mServer.getActionArray();
+                    previousActions = mServer.getPreviousActions();
+                    //spinnerArray = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, actionArray);
+                    //actionMenu.setAdapter(spinnerArray);
+                    spinnerArray.notifyDataSetChanged();
+                    drawPrevious();
 
-                //calling a method to reset the timer.
-                resetUI();
+                    //calling a method to reset the timer.
+                    resetUI();
+                }
             }
         }, millis);
     }

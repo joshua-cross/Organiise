@@ -16,6 +16,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ChartDaily" />
+
+        <service
+            android:name=".Activity"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".Actions"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
