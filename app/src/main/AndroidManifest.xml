@@ -25,7 +25,9 @@
         <service
             android:name=".Actions"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
+
+        <activity android:name=".ChartDailyPreview"></activity>
     </application>
 
 </manifest>

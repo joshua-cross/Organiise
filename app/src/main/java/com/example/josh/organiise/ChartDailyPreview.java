@@ -22,7 +22,7 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChartDaily extends AppCompatActivity {
+public class ChartDailyPreview extends AppCompatActivity {
 
     Button back;
     boolean mBounded;
@@ -46,7 +46,7 @@ public class ChartDaily extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                Intent home = new Intent(ChartDaily.this, MainActivity.class);
+                Intent home = new Intent(ChartDailyPreview.this, MainActivity.class);
                 startActivity(home);
 
             }
@@ -63,14 +63,14 @@ public class ChartDaily extends AppCompatActivity {
     ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Toast.makeText(ChartDaily.this, "Service is disconnected", 1000).show();
+            Toast.makeText(ChartDailyPreview.this, "Service is disconnected", 1000).show();
             mBounded = false;
             mServer = null;
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Toast.makeText(ChartDaily.this, "Service is connected", 1000).show();
+            Toast.makeText(ChartDailyPreview.this, "Service is connected", 1000).show();
             mBounded = true;
             Actions.LocalBinder mLocalBinder = (Actions.LocalBinder)service;
             mServer = mLocalBinder.getServerInstance();
@@ -105,9 +105,6 @@ public class ChartDaily extends AppCompatActivity {
         dailyBarChart.animateY(500);
         //dailyBarChart.animateX(500);
         dailyBarChart.invalidate();
-
-        //will add the daily array, and clear the old daily array.
-        mServer.addDailyArrays();
 
     }
 

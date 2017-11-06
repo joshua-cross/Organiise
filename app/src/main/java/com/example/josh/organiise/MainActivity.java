@@ -125,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
         editButtons[3] = (Button) findViewById((R.id.previousButton3));
         editButtons[4] = (Button) findViewById((R.id.previousButton4));
 
-        chartPage = (Button) findViewById(R.id.Chart);
 
         Time = (TextView) findViewById((R.id.Time));
 
@@ -265,14 +264,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        //if the chart page button has been pressed.
-        chartPage.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent startChartPage = new Intent(MainActivity.this, ChartDaily.class);
-                startActivity(startChartPage);
-            }
-        });
-
     }
 
     @Override

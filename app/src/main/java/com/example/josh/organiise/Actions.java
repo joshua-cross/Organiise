@@ -35,6 +35,14 @@ public class Actions extends Service {
     //an int arrayList that will keep track of how many times each action has been chosen.
     ArrayList<Integer> actionCounter = new ArrayList<Integer>();
 
+    //actionArray, and actionCounter for each month.
+    ArrayList<String> monthlyActionArray = new ArrayList<>();
+    ArrayList<Integer> monthlyActionCounter = new ArrayList<>();
+
+    //actionArray, and actionCounter for each year.
+    ArrayList<String> yearlyActionArray = new ArrayList<>();
+    ArrayList<Integer> yearlyActionCounter = new ArrayList<>();
+
     //BOOL WHICH DETERMINES IF THE BUTTON HAS BEEN PRESSED OR NOT,.
     public boolean confirmButtonPressed = false;
 
@@ -111,6 +119,21 @@ public class Actions extends Service {
             previousActions = tinydb.getListString("previous");
         }
 
+        if(tinydb.getListString("yearlyActions").size() != 0) {
+            yearlyActionArray = tinydb.getListString("yearlyActions");
+        }
+
+        if(tinydb.getListInt("yearlyCounter").size() != 0) {
+            yearlyActionCounter = tinydb.getListInt("yearlyCounter");
+        }
+
+        if(tinydb.getListString("monthlyActions").size() != 0) {
+            monthlyActionArray = tinydb.getListString("monthlyActions");
+        }
+
+        if(tinydb.getListInt("monthlyCounter").size() != 0) {
+            monthlyActionCounter = tinydb.getListInt("monthlyCounter");
+        }
 
         //checking if the daily times have a value. if they don't we will assign them a value here.
         if(tinydb.getInt("todayYear") == 0 && tinydb.getInt("todayMonth") == 0 && tinydb.getInt("todayDate") == 0) {
@@ -295,6 +318,8 @@ public class Actions extends Service {
         }
 
 
+
+
         //checking if the daily times have a value. if they don't we will assign them a value here.
         if(tinydb.getInt("todayYear") == 0 && tinydb.getInt("todayMonth") == 0 && tinydb.getInt("todayDate") == 0) {
             //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
@@ -401,18 +426,20 @@ public class Actions extends Service {
                 //only do the following if the confirm button has not been pressed.
                 if(confirmButtonPressed == false) {
                     //if, after an hour a hour the user has not chosen a new action, then we will choose the last action that was chosen.
-                    //if the array size is 0 then the array is empty so don't do anyrhing.
-                    if (getLastAction(1).equals(null)) {
+                    if(actionArray.size() != 0) {
+                        //if the array size is 0 then the array is empty so don't do anyrhing.
+                        if (getLastAction(1).equals(null)) {
 
-                    }
-                    //else there is something in the array so we will increment the last chosen item by one.
-                    else {
+                        }
+                        //else there is something in the array so we will increment the last chosen item by one.
+                        else {
 
-                        String currLast = getLastAction(1);
-                        //incrementing the last action in the array.
-                        incrementArray(currLast);
-                        //setPreviousActions(currLast);
-                        setPreviousActions(currLast);
+                            String currLast = getLastAction(1);
+                            //incrementing the last action in the array.
+                            incrementArray(currLast);
+                            //setPreviousActions(currLast);
+                            setPreviousActions(currLast);
+                        }
                     }
                 }
 
@@ -503,10 +530,10 @@ public class Actions extends Service {
                     //checking to see if we have displayed the graphs to the user before.
                     if(!midnight) {
                         midnight = true;
-                        //TODO: create notification here.
-
-                        //TODO: link to graph here
+                        dailyChartNotification();
                     }
+                } else {
+                    midnight = false;
                 }
 
                 //if the time is currently the time before we go to sleep then do nothing.
@@ -787,8 +814,30 @@ public class Actions extends Service {
         Notification notif = new Notification.Builder(this)
                 //the location of the icon.
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Hello Android Hari")
-                .setContentText("Welcome to Notification Service")
+                .setContentTitle("Action Required")
+                .setContentText("What have you been up to in the last hour?")
+                .setContentIntent(pintent)
+                .build();
+
+
+        notificationmgr.notify(0,notif);
+    }
+
+    //function that prints the notifications, this will be printed every hour.
+    public void dailyChartNotification() {
+
+        NotificationManager notificationmgr = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        Intent intent = new Intent(this, ChartDaily.class);
+        PendingIntent pintent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
+
+        //   PendingIntent pintent = PendingIntent.getActivities(this,(int)System.currentTimeMillis(),intent, 0);
+
+
+        Notification notif = new Notification.Builder(this)
+                //the location of the icon.
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Daily Chart Ready")
+                .setContentText("Click here to view your daily notification")
                 .setContentIntent(pintent)
                 .build();
 
@@ -811,6 +860,135 @@ public class Actions extends Service {
         return actionCounter;
     }
 
+    //getter for monthly actions
+    public ArrayList<String> getMonthlyActionArray() {
+        return monthlyActionArray;
+    }
+
+    //getter for monthly counter.
+    public ArrayList<Integer> getMonthlyActionCounter() {
+        return monthlyActionCounter;
+    }
+
+    //getter for yearly actions
+    public ArrayList<String> getYearlyActionArray() {
+        return yearlyActionArray;
+    }
+
+    //getter for yearly counter
+    public ArrayList<Integer> getYearlyActionCounter() {
+        return yearlyActionCounter;
+    }
+
+
+    //function which emptys the daily action array, the daily action counter, and the previous actions.
+    public void clearDailyArrays() {
+        actionArray.clear();
+        actionCounter.clear();
+        previousActions.clear();
+        Context context = Actions.this.getApplicationContext();
+        TinyDB tinydb = new TinyDB(context);
+        tinydb.putListString("actions", actionArray);
+        tinydb.putListInt("counter", actionCounter);
+        tinydb.putListString("previous", previousActions);
+    }
+
+    //same as clearDailyArrays but for months.
+    public void clearMonthlyArrays() {
+        monthlyActionArray.clear();
+        monthlyActionCounter.clear();
+        Context context = Actions.this.getApplicationContext();
+        TinyDB tinydb = new TinyDB(context);
+        tinydb.putListString("monthlyActions", monthlyActionArray);
+        tinydb.putListInt("monthlyCounter", monthlyActionCounter);
+    }
+
+    //same as clearDailyArrays but for months.
+    public void clearYearlyArrays() {
+        yearlyActionArray.clear();
+        yearlyActionCounter.clear();
+        Context context = Actions.this.getApplicationContext();
+        TinyDB tinydb = new TinyDB(context);
+        tinydb.putListString("yealryActions", yearlyActionArray);
+        tinydb.putListInt("yearlyCounter", yearlyActionCounter);
+    }
+
+    //function that adds the data from the daily actionArray, and actionCounter to the monthly and yearly arrays; onlt to be called from ChartDaily.
+    public void addDailyArrays() {
+
+        //boolean that checks if the action is new.
+        boolean isNew = true;
+
+        //looping around the daily array.
+        for (int i = 0; i < actionArray.size(); i = i + 1) {
+            //looping through the daily array.
+            isNew = true;
+
+            for(int x = 0; x < yearlyActionArray.size(); x = x + 1) {
+                //boolean that checks if the current daily element (x) is new to the yearly array.
+                boolean newYearlyElement = true;
+                //comparing the currently selected yearly element yearlyActionArray(x), with the daily element actionArray.get(i), if they're the same break.
+                if(actionArray.get(i).equalsIgnoreCase(yearlyActionArray.get(x))) {
+                    newYearlyElement = false;
+                    //do things here
+                    //the new counter integer.
+                    int newYearlyCounter = yearlyActionCounter.get(x) + 1;
+                    //setting the yearly action counter to be the new value.
+                    yearlyActionCounter.set(x, newYearlyCounter);
+                    System.out.println("Daily element: " + actionArray.get(i) + " exists in the yearly array, the new count is: " + yearlyActionCounter.get(x));
+                    break;
+                }
+            }
+
+            //if we get to this point and isNew = true then the last daily element must not have existed before, in which case we will add the new element
+            if(isNew) {
+                //add to array.
+                yearlyActionArray.add(actionArray.get(i));
+                yearlyActionCounter.add(1);
+            }
+        }
+
+
+        //looping around the daily array.
+        for (int i = 0; i < actionArray.size(); i = i + 1) {
+            //looping through the daily array.
+            isNew = true;
+
+            for(int x = 0; x < monthlyActionArray.size(); x = x + 1) {
+                //boolean that checks if the current daily element (x) is new to the yearly array.
+                boolean newYearlyElement = true;
+                //comparing the currently selected yearly element yearlyActionArray(x), with the daily element actionArray.get(i), if they're the same break.
+                if(actionArray.get(i) == monthlyActionArray.get(x)) {
+                    newYearlyElement = false;
+                    //do things here
+                    //the new counter integer.
+                    int newMonthlyCounter = monthlyActionCounter.get(x) + 1;
+                    //setting the yearly action counter to be the new value.
+                    monthlyActionCounter.set(x, newMonthlyCounter);
+                    System.out.println("Daily element: " + actionArray.get(i) + " exists in the monthyl array, the new count is: " + monthlyActionCounter.get(x));
+                    break;
+                }
+            }
+
+            //if we get to this point and isNew = true then the last daily element must not have existed before, in which case we will add the new element
+            if(isNew) {
+                //add to array.
+                monthlyActionArray.add(actionArray.get(i));
+                monthlyActionCounter.add(1);
+            }
+        }
+
+        clearDailyArrays();
+
+        Context context = Actions.this.getApplicationContext();
+        TinyDB tinydb = new TinyDB(context);
+        tinydb.putListString("yearlyActions", yearlyActionArray);
+        tinydb.putListInt("yearlyCounter", yearlyActionCounter);
+        tinydb.putListString("monthlyActions", monthlyActionArray);
+        tinydb.putListInt("monthlyCounter", monthlyActionCounter);
+    }
+
+    //saving the new yearly array to the database.
 
 
 
