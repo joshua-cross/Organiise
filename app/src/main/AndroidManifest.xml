@@ -27,7 +27,8 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".ChartDailyPreview"></activity>
+        <activity android:name=".ChartDailyPreview" />
+        <activity android:name=".Edit"></activity>
     </application>
 
 </manifest>

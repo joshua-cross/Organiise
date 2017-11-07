@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.josh.organiise.Edit"
+    android:background="@color/grey"
+    app:theme = "@style/EditText">
+
+    <include
+        android:id="@+id/app_bar"
+        layout="@layout/app_bar"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
+
+    </include>
+
+    <TextView
+        android:id="@+id/EnterNewValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Enter new value"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/app_bar" />
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="287dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="28dp"
+        android:ems="10"
+        android:textColor="@color/white"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.512"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/EnterNewValue" />
+
+    <TextView
+        android:id="@+id/previousAction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="40dp"
+        android:text="Action not Available..."
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chooseEdit" />
+
+    <TextView
+        android:id="@+id/previousAction1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="28dp"
+        android:text="Action not Available..."
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/previousAction" />
+
+    <TextView
+        android:id="@+id/previousAction2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="28dp"
+        android:text="Action not Available..."
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/previousAction1" />
+
+    <TextView
+        android:id="@+id/previousAction3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="28dp"
+        android:text="Action not Available..."
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/previousAction2" />
+
+    <TextView
+        android:id="@+id/previousAction4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="28dp"
+        android:text="Action not Available..."
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/previousAction3" />
+
+    <TextView
+        android:id="@+id/chooseEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        android:text="Choose which action you wish to edit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editText" />
+
+    <Button
+        android:id="@+id/previousButton"
+        android:layout_width="75dp"
+        android:layout_height="37dp"
+        android:layout_marginEnd="44dp"
+        android:background="@color/red"
+        android:text="Edit"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/previousAction" />
+
+    <Button
+        android:id="@+id/previousButton1"
+        android:layout_width="75dp"
+        android:layout_height="37dp"
+        android:layout_marginEnd="44dp"
+        android:background="@color/red"
+        android:text="Edit"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/previousAction1" />
+
+    <Button
+        android:id="@+id/previousButton2"
+        android:layout_width="75dp"
+        android:layout_height="37dp"
+        android:layout_marginEnd="44dp"
+        android:background="@color/red"
+        android:text="Edit"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/previousAction2" />
+
+    <Button
+        android:id="@+id/previousButton3"
+        android:layout_width="75dp"
+        android:layout_height="37dp"
+        android:layout_marginEnd="44dp"
+        android:background="@color/red"
+        android:text="Edit"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/previousAction3" />
+
+    <Button
+        android:id="@+id/previousButton4"
+        android:layout_width="75dp"
+        android:layout_height="37dp"
+        android:layout_marginEnd="44dp"
+        android:background="@color/red"
+        android:text="Edit"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/previousAction4" />
+
+
+</android.support.constraint.ConstraintLayout>

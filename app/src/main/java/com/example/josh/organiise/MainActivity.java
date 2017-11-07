@@ -1,17 +1,7 @@
 package com.example.josh.organiise;
 
-import java.time.LocalTime;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.*;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.*;
-import java.text.ParseException;
 
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -19,25 +9,12 @@ import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.Window;
 import android.widget.Toast;
 import android.content.ComponentName;
-import android.widget.Adapter;
 import android.text.TextUtils;
 import android.content.Context;
 import android.os.Handler;
-import android.os.Message;
-import android.content.SharedPreferences;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.graphics.BitmapFactory;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.content.res.Resources;
 //import that's needed for the input boxes.
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -48,7 +25,6 @@ import android.widget.Spinner;
 import android.widget.Button;
 //importing the intent.
 import android.content.Intent;
-import android.widget.Toolbar;
 
 import com.example.josh.organiise.Actions.LocalBinder;
 
@@ -120,10 +96,12 @@ public class MainActivity extends AppCompatActivity {
         actionMenu = (Spinner) findViewById(R.id.ActionMenu);
         spinnerArray = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, actionArray);
 
+
+        /*
         //setting the actions array.
         actionText[0] = (TextView) findViewById((R.id.previousAction));
         actionText[1] = (TextView) findViewById((R.id.PreviousAction1));
-        actionText[2] = (TextView) findViewById((R.id.previousAction2));
+        actionText[2] = (TextView) findViewById((R.id.previousAction3));
         actionText[3] = (TextView) findViewById((R.id.previousAction3));
         actionText[4] = (TextView) findViewById((R.id.previousAction4));
 
@@ -132,9 +110,8 @@ public class MainActivity extends AppCompatActivity {
         editButtons[2] = (Button) findViewById((R.id.previousButton2));
         editButtons[3] = (Button) findViewById((R.id.previousButton3));
         editButtons[4] = (Button) findViewById((R.id.previousButton4));
+        */
 
-
-        Time = (TextView) findViewById((R.id.Time));
 
 
         android.support.v7.widget.Toolbar toolbar = ( android.support.v7.widget.Toolbar) findViewById(R.id.app_bar);
@@ -216,6 +193,10 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
+
+
+        /*
+
         //if the first edit button has been clicked.
         editButtons[0].setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -224,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
 
                     mServer.editPressed(0, action.getText().toString());
 
-                    drawPrevious();
+                    //drawPrevious();
 
                 }
 
@@ -240,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                     mServer.editPressed(1, action.getText().toString());
 
 
-                    drawPrevious();
+                    //drawPrevious();
 
                 }
 
@@ -256,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
                     mServer.editPressed(2, action.getText().toString());
 
 
-                    drawPrevious();
+                    //drawPrevious();
                 }
 
             }
@@ -269,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
 
                     mServer.editPressed(3, action.getText().toString());
 
-                    drawPrevious();
+                    //drawPrevious();
 
                 }
 
@@ -283,11 +264,12 @@ public class MainActivity extends AppCompatActivity {
                     mServer.editPressed(4, action.getText().toString());
 
 
-                    drawPrevious();
+                    //drawPrevious();
                 }
 
             }
         });
+        */
     }
 
     @Override
@@ -376,7 +358,7 @@ public class MainActivity extends AppCompatActivity {
             //if there are some previous actions.
             if(mServer.getActionArray().size() != 0) {
                 actionArray = mServer.getActionArray();
-                spinnerArray = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, actionArray);
+                spinnerArray = new ArrayAdapter<String>(context, R.layout.spinner_item, actionArray);
                 actionMenu.setAdapter(spinnerArray);
             }
 
@@ -391,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             //setting the previousText boxes initially.
-            drawPrevious();
+            //drawPrevious();
         }
     };
 
@@ -407,7 +389,7 @@ public class MainActivity extends AppCompatActivity {
     */
 
 
-
+    /*
     private void drawPrevious() {
 
         //System.out.println("There are: " + previousActions.size() + " previous actions.");
@@ -444,6 +426,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+    */
 
 
     //a function that updates the UI.
@@ -467,7 +450,7 @@ public class MainActivity extends AppCompatActivity {
                     //spinnerArray = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, actionArray);
                     //actionMenu.setAdapter(spinnerArray);
                     spinnerArray.notifyDataSetChanged();
-                    drawPrevious();
+                    //drawPrevious();
 
                     //calling a method to reset the timer.
                     resetUI();
@@ -490,8 +473,24 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            default: System.out.println("item selected");
+
+        String menu1 = getResources().getString(R.string.menuText1);
+        String menu2 = getResources().getString(R.string.menuText2);
+        String menu3 = getResources().getString(R.string.menuText3);
+        String menu4 = getResources().getString(R.string.menuText4);
+        String menu5 = getResources().getString(R.string.menuText5);
+
+        if(item.toString().equals(menu1)) {
+            System.out.println("smashing!");
+        } else if(item.toString().equals(menu2)) {
+
+        } else if(item.toString().equals(menu3)) {
+
+        } else if(item.toString().equals(menu4)) {
+            Intent editPage = new Intent (this, Edit.class);
+            startActivity(editPage);
+        } else if(item.toString().equals(menu5)) {
+
         }
         return super.onOptionsItemSelected(item);
     }

@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey"
-    tools:context="com.example.josh.organiise.MainActivity">
+    tools:context="com.example.josh.organiise.MainActivity"
+    app:theme = "@style/EditText"
+    >
 
 
     <include
@@ -19,218 +21,80 @@
 
     <EditText
         android:id="@+id/currentAction"
-        android:layout_width="350dp"
-        android:layout_height="51dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="80dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.115"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_bar"
-        app:layout_constraintVertical_bias="0.087" />
+        app:layout_constraintTop_toBottomOf="@+id/Introduction" />
 
     <Button
         android:id="@+id/submitAction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="364dp"
-        android:text="Confirm"
+        android:layout_width="76dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="80dp"
         android:background="@color/red"
+        android:text="Confirm"
         android:textColor="@color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/currentAction" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/currentAction"
+        app:layout_constraintTop_toBottomOf="@+id/Introduction" />
 
     <Spinner
         android:id="@+id/ActionMenu"
-        android:layout_width="368dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_width="342dp"
+        android:layout_height="23dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="80dp"
+        android:textColor="@color/red"
+        android:popupBackground="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.456" />
+        app:layout_constraintTop_toBottomOf="@+id/Or" />
 
     <TextView
         android:id="@+id/Introduction"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Type below or use drop down menu to type action"
-        android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/currentAction"
-        app:layout_constraintTop_toBottomOf="@+id/app_bar"
-        tools:layout_editor_absoluteX="16dp" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:text="Drop down menu"
+        android:layout_marginTop="24dp"
+        android:text="Type action for hour:"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toTopOf="@+id/ActionMenu"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:textSize="18dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/app_bar" />
 
     <TextView
         android:id="@+id/Add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="124dp"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.041"
-        android:textColor="@color/white"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ActionMenu"
-        app:layout_constraintVertical_bias="0.025" />
+        app:layout_constraintRight_toRightOf="parent" />
 
     <TextView
-        android:id="@+id/PreviousAction1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:textColor="@color/white"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/previousAction" />
-
-    <TextView
-        android:id="@+id/previousAction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/Add" />
-
-    <TextView
-        android:id="@+id/previousAction2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/PreviousAction1" />
-
-    <TextView
-        android:id="@+id/previousAction3"
-        android:layout_width="wrap_content"
-        android:layout_height="16dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/previousAction2" />
-
-    <TextView
-        android:id="@+id/previousAction4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="28dp"
-        android:textColor="@color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/previousAction3" />
-
-    <Button
-        android:id="@+id/previousButton"
-        android:layout_width="62dp"
-        android:layout_height="39dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:text="Edit"
-        android:background="@color/red"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.973"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ActionMenu" />
-
-    <Button
-        android:id="@+id/previousButton1"
-        android:layout_width="62dp"
-        android:layout_height="35dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:text="Edit"
-        android:background="@color/red"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.973"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/previousButton" />
-
-    <Button
-        android:id="@+id/previousButton2"
-        android:layout_width="62dp"
-        android:layout_height="39dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:text="Edit"
-        android:background="@color/red"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.973"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/previousButton1" />
-
-    <Button
-        android:id="@+id/previousButton3"
-        android:layout_width="62dp"
-        android:layout_height="39dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Edit"
-        android:background="@color/red"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.973"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/previousButton2" />
-
-    <Button
-        android:id="@+id/previousButton4"
-        android:layout_width="62dp"
-        android:layout_height="39dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
-        android:text="Edit"
-        android:background="@color/red"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.973"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/previousButton3" />
-
-    <TextView
-        android:id="@+id/Time"
+        android:id="@+id/Or"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="12dp"
-        android:text="TextView"
+        android:layout_marginTop="80dp"
+        android:text="Or use the menu"
         android:textColor="@color/white"
+        android:textSize="18dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.938"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/currentAction" />
 
