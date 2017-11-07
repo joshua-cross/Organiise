@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Organiise</string>
+    <string name="menuText1">Preview Daily Chart</string>
+    <string name="menuText2">Preview Monthly Chart</string>
+    <string name="menuText3">Preview Yearly Chart</string>
+    <string name="menuText4">Edit Previous Actions</string>
+    <string name="menuText5">Edit Goals and Sleep Times</string>
+
+    <string name="appName">Organiise</string>
+    <color name="grey">#282828</color>
+    <color name="white">#FFFFFF</color>
+    <color name="red">#ff6961</color>
+
+    #ff6961
 </resources>

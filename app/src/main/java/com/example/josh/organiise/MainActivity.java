@@ -15,6 +15,11 @@ import java.text.SimpleDateFormat;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v7.app.ActionBar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.Window;
 import android.widget.Toast;
 import android.content.ComponentName;
 import android.widget.Adapter;
@@ -43,6 +48,8 @@ import android.widget.Spinner;
 import android.widget.Button;
 //importing the intent.
 import android.content.Intent;
+import android.widget.Toolbar;
+
 import com.example.josh.organiise.Actions.LocalBinder;
 
 
@@ -51,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     boolean mBounded;
     Actions mServer;
+
 
     EditText action;
     //A string ArrayList which will save all the unquie actions that the user has saved to the phone..
@@ -129,6 +137,22 @@ public class MainActivity extends AppCompatActivity {
         Time = (TextView) findViewById((R.id.Time));
 
 
+        android.support.v7.widget.Toolbar toolbar = ( android.support.v7.widget.Toolbar) findViewById(R.id.app_bar);
+        setSupportActionBar(toolbar);
+
+        ActionBar app_bar = getSupportActionBar();
+
+        //app_bar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        //app_bar.setCustomView(R.layout.app_bar);
+
+        //getSupportActionBar().setDisplayShowTitleEnabled(true);
+        //getSupportActionBar().setTitle("Canteen Home");
+        //getSupportActionBar().setHomeButtonEnabled(true);
+
+        //app_bar.setDisplayShowCustomEnabled(true);
+        app_bar.setDisplayShowTitleEnabled(false);
+        //app_bar.setDisplayHomeAsUpEnabled(true);
+        //app_bar.setHomeButtonEnabled(true);
 
 
         //reference to the button which will submit the action.
@@ -457,5 +481,18 @@ public class MainActivity extends AppCompatActivity {
         updateUI();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            default: System.out.println("item selected");
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

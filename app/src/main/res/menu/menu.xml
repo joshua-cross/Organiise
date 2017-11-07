@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/android_menu1"
+        android:title="@string/menuText1"
+        android:layout_gravity="left"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/android_menu2"
+        android:title="@string/menuText2"
+        android:layout_gravity="left"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/android_menu3"
+        android:title="@string/menuText3"
+        android:layout_gravity="left"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/android_menu4"
+        android:title="@string/menuText4"
+        android:layout_gravity="left"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/android_menu5"
+        android:title="@string/menuText5"
+        android:layout_gravity="left"
+        app:showAsAction="never"/>
+
+
+</menu>
