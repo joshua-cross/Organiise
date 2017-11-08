@@ -67,6 +67,9 @@ public class Actions extends Service {
     //integers for when the yearly chart will show up.
     int yYear, yMonth, yDate, yHour, yMinute, ySecond;
 
+    //this will beb when the user can enter a new action.
+    int hour, minute, second, day, month, year;
+
     //boolean to check if the user has been asleep today.
     boolean isAsleep = false;
 
@@ -78,6 +81,8 @@ public class Actions extends Service {
 
     boolean active = false;
 
+    //boolean that checks if the confirm button/drop down has been pressed in the main activty; false by dewfault as user would not hgave selected an action when they have first loaded app.
+    boolean hasSelected = false;
 
 
     IBinder mBinder = new LocalBinder();
@@ -99,7 +104,7 @@ public class Actions extends Service {
         System.out.println("Testing");
 
         secondCounter();
-        startCountdown();
+        //startCountdown();
 
 
         Context context = Actions.this.getApplicationContext();
@@ -133,6 +138,30 @@ public class Actions extends Service {
 
         if(tinydb.getListInt("monthlyCounter").size() != 0) {
             monthlyActionCounter = tinydb.getListInt("monthlyCounter");
+        }
+
+        hasSelected = tinydb.getBoolean("confirmed");
+
+        //if hour has no value.
+        if(tinydb.getInt("targetHour") == 0) {
+            Calendar cal = Calendar.getInstance();
+            year = cal.get(Calendar.YEAR);
+            month = cal.get(Calendar.MONTH);
+            day = cal.get(Calendar.DATE);
+            hour = cal.get(Calendar.HOUR_OF_DAY) + 1;
+            minute = 0;
+            second = 0;
+            tinydb.putInt("targetHour", hour);
+
+        } else {
+
+            Calendar cal = Calendar.getInstance();
+            year = cal.get(Calendar.YEAR);
+            month = cal.get(Calendar.MONTH);
+            day = cal.get(Calendar.DATE);
+            minute = 0;
+            second = 0;
+            hour = tinydb.getInt("targetHour");
         }
 
         //checking if the daily times have a value. if they don't we will assign them a value here.
@@ -402,52 +431,6 @@ public class Actions extends Service {
     }
 
 
-    //timer that shows the user every hour that they need to input new data.
-    public void startCountdown()
-    {
-
-        //int millis = ((hours*60)+mins)*60000; // Need milliseconds to use Timer
-        int millis = 10000;
-
-
-        //Had to use handler instead of Java timer as this did not allow for the GUI to be updated.
-        Handler handler = new Handler();
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                //code that runs when timer is done
-                //only send notifications if user is not asleep.
-                if(!isAsleep) {
-                    //showing the notifications
-                    showNotification();
-                }
-
-                //only do the following if the confirm button has not been pressed.
-                if(confirmButtonPressed == false) {
-                    //if, after an hour a hour the user has not chosen a new action, then we will choose the last action that was chosen.
-                    if(actionArray.size() != 0) {
-                        //if the array size is 0 then the array is empty so don't do anyrhing.
-                        if (getLastAction(1).equals(null)) {
-
-                        }
-                        //else there is something in the array so we will increment the last chosen item by one.
-                        else {
-
-                            String currLast = getLastAction(1);
-                            //incrementing the last action in the array.
-                            incrementArray(currLast);
-                            //setPreviousActions(currLast);
-                            setPreviousActions(currLast);
-                        }
-                    }
-                }
-
-                //calling a method to reset the timer.
-                resetTimer();
-            }
-        }, millis);
-    }
 
     //timer for every second so we can see if it's past sleep time.
     public void secondCounter()
@@ -486,6 +469,10 @@ public class Actions extends Service {
                 Calendar year = Calendar.getInstance();
                 year.set(yYear, yMonth, yDate, 00, 00, 00);
 
+                Calendar nextHour = Calendar.getInstance();
+                nextHour.set(nextHour.get(Calendar.YEAR), nextHour.get(Calendar.MONTH), day, hour, 00, 00);
+
+
                 Date now = new Date();
                 //System.out.println(now);
 
@@ -494,7 +481,40 @@ public class Actions extends Service {
                 //System.out.println("now: " + now);
                 //System.out.println("month: " + month.getTime());
                 //System.out.println("year: " + year.getTime());
+                System.out.println("hour: " + nextHour.getTime());
 
+                if(now.after(nextHour.getTime())) {
+                    Context context = Actions.this.getApplicationContext();
+                    TinyDB tinydb = new TinyDB(context);
+                    Calendar cal = Calendar.getInstance();
+                    hour = cal.get(Calendar.HOUR_OF_DAY) + 1;
+                    tinydb.putInt("targetHour", yMonth);
+                    //if the user has not selected snything in the last hour, then we will increment the previously chosen action
+                    if(!hasSelected) {
+                        //only add the previous if we are not yet asleep.
+                        if(!isAsleep) {
+                            String currLast = getLastAction(1);
+                            //incrementing the last action in the array.
+                            //Ensuring that we don't increment something that's null.
+                            if (currLast != null) {
+                                incrementArray(currLast);
+                                //setPreviousActions(currLast);
+                                setPreviousActions(currLast);
+                            }
+                        //if we are asleep then we're going to add sleep instead.
+                        } else {
+                            actionAdded("sleep");
+                        }
+                    }
+                    //else they have selected something, in this case we will reset hasSelected for the last hour.
+                    else {
+                        setHasSelected(false);
+                    }
+                    if(!isAsleep) {
+                        //showing the notifications
+                        showNotification();
+                    }
+                }
 
                 //TODO: charts for both yearly, and monthly.
                 //checking to see if it's been a year after we first used the application.
@@ -537,44 +557,15 @@ public class Actions extends Service {
                 }
 
                 //if the time is currently the time before we go to sleep then do nothing.
-                if (now.before(cSleep.getTime())) {
+
                     //System.out.println("Before bed time");
                     //else if the time is whilst we are asleep we are going to check firstly, if we have slept before, if not we are going to add this to the array, and the previous actions so this happens
                     //whilst the user is asleep, and secondly, if we have already checked, if we do this continuously every second we are going to fill up the counterArray very quickly.
-                } else if (now.after(cSleep.getTime()) && now.before(cWakeup.getTime())) {
+                if (now.after(cSleep.getTime()) && now.before(cWakeup.getTime())) {
                     //stopping the program from constantly adding 1 to sleep every second.
                     if(!isAsleep) {
                         //System.out.println("Asleep. ZZZ");
                         isAsleep = true;
-                        //boolean that checks if the user has used the app whilst he/she has slept before.
-                        boolean SleptBefore = false;
-                        for(int i = 0; i < actionArray.size(); i = i + 1) {
-                            //if sleep is already an action, then we do not want to add it..
-                            if(actionArray.get(i) == "sleep") {
-                                //we have slept before so do not go into the if statement below.
-                                SleptBefore = true;
-                                int newActionCounter = actionCounter.get(i) + 1;
-                                //then we will set the current action counter to be this.
-                                actionCounter.set(i, newActionCounter);
-                                //setting one of the previous actions.
-                                setPreviousActions(actionArray.get(i));
-
-                                break;
-                            }
-                        }
-
-                        if(!SleptBefore) {
-                            actionArray.add("sleep");
-                            setPreviousActions("sleep");
-                            actionCounter.add(1);
-                            System.out.println("New element detected...");
-                            SleptBefore = true;
-                        }
-
-                        Context context = Actions.this.getApplicationContext();
-                        TinyDB tinydb = new TinyDB(context);
-                        tinydb.putListString("actions", actionArray);
-                        tinydb.putListInt("counter", actionCounter);
 
                     }
                     //else if the time is after we have slept we are going to recalculate the times, adding one to tomorrow, so we know when the next time the user will sleep is.
@@ -620,7 +611,7 @@ public class Actions extends Service {
     private void resetTimer() {
         //reset the button as it is a new hour and we don't know if the button has been pressed yet.
         setConfirmButtonPressed(false);
-        startCountdown();
+        //startCountdown();
     }
 
 
@@ -842,7 +833,7 @@ public class Actions extends Service {
                 .build();
 
 
-        notificationmgr.notify(0,notif);
+        notificationmgr.notify(1,notif);
     }
 
     //getter for the action list.
@@ -962,7 +953,7 @@ public class Actions extends Service {
                     newYearlyElement = false;
                     //do things here
                     //the new counter integer.
-                    int newMonthlyCounter = monthlyActionCounter.get(x) + 1;
+                    int newMonthlyCounter = monthlyActionCounter.get(x) + actionCounter.get(i);
                     //setting the yearly action counter to be the new value.
                     monthlyActionCounter.set(x, newMonthlyCounter);
                     System.out.println("Daily element: " + actionArray.get(i) + " exists in the monthyl array, the new count is: " + monthlyActionCounter.get(x));
@@ -974,7 +965,7 @@ public class Actions extends Service {
             if(isNew) {
                 //add to array.
                 monthlyActionArray.add(actionArray.get(i));
-                monthlyActionCounter.add(1);
+                monthlyActionCounter.add(actionCounter.get(i));
             }
         }
 
@@ -990,7 +981,19 @@ public class Actions extends Service {
 
     //saving the new yearly array to the database.
 
+    //setter for hasSelected, this will be called from the drop down Spinner or the confirm button.
+    public void setHasSelected(boolean confirmed) {
+        hasSelected = confirmed;
+        Context context = Actions.this.getApplicationContext();
+        TinyDB tinydb = new TinyDB(context);
+        tinydb.putBoolean("confirmed", hasSelected);
 
+    }
+
+    //getter for hasSelected.
+    public boolean getHasSelected(){
+        return hasSelected;
+    }
 
 
 }

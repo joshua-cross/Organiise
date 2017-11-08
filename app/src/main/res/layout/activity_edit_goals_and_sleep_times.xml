@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey"
-    tools:context="com.example.josh.organiise.ChartDaily">
+    tools:context="com.example.josh.organiise.EditGoalsAndSleepTimes">
 
     <include
         android:id="@+id/app_bar"
@@ -15,16 +15,5 @@
 
     </include>
 
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/DailyChart"
-        android:layout_width="358dp"
-        android:layout_height="446dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="36dp"
-        android:background="@color/grey"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.722"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_bar" />
+
 </android.support.constraint.ConstraintLayout>

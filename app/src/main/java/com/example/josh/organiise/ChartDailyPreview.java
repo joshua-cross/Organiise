@@ -47,7 +47,6 @@ public class ChartDailyPreview extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chart_daily_preview);
 
-        back = (Button) findViewById(R.id.Back);
 
         dailyBarChart = (PieChart) findViewById(R.id.DailyChartPreview);
 
@@ -189,14 +188,17 @@ public class ChartDailyPreview extends AppCompatActivity {
             Intent editPage = new Intent (this, ChartDailyPreview.class);
             startActivity(editPage);
         } else if(item.toString().equals(menu2)) {
-
+            Intent editPage = new Intent (this, ChartMonthlyPreview.class);
+            startActivity(editPage);
         } else if(item.toString().equals(menu3)) {
-
+            Intent editPage = new Intent (this, ChartYearlyPreview.class);
+            startActivity(editPage);
         } else if(item.toString().equals(menu4)) {
             Intent editPage = new Intent (this, Edit.class);
             startActivity(editPage);
         } else if(item.toString().equals(menu5)) {
-
+            Intent editPage = new Intent (this, EditGoalsAndSleepTimes.class);
+            startActivity(editPage);
         }
         return super.onOptionsItemSelected(item);
     }

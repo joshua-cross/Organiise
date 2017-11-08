@@ -67,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     //ArrayList, which can hold 5 of the previous actions which will be displayed to the user.
     ArrayList<String> previousActions = new ArrayList<String>();
 
+    TextView hasEnteredText;
+
 
     //TODO: add button that makes user wakeup/sleep variables equal to a time of there choosing
 
@@ -96,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
         actionMenu = (Spinner) findViewById(R.id.ActionMenu);
         spinnerArray = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, actionArray);
 
+
+        hasEnteredText = (TextView) findViewById(R.id.AlreadyEntered);
 
         /*
         //setting the actions array.
@@ -136,58 +140,72 @@ public class MainActivity extends AppCompatActivity {
         Button sumbitAction = (Button) findViewById(R.id.submitAction);
         sumbitAction.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                //mServer.message();
-                System.out.println(action.getText().toString());
-                //showNotification();
 
-                //The confirm button has been pressed so change this to true; this will stop the last element being updated when we have already chosen an update for the hour.
-                mServer.setConfirmButtonPressed(true);
+                //only do any of the following if we have not confirmed an action is the last hour.
+                if(!mServer.getHasSelected()) {
+                    //mServer.message();
+                    System.out.println(action.getText().toString());
+                    //showNotification();
 
-                //a boolean which will return true at the end of the array if there is no element that contrains the same string.
-                boolean notDuplicate = false;
+                    //The confirm button has been pressed so change this to true; this will stop the last element being updated when we have already chosen an update for the hour.
+                    mServer.setConfirmButtonPressed(true);
 
-                //Have to add this as we do not go around the for loop with an empty array...
-                if (actionArray.size() == 0) {
-                    notDuplicate = true;
-                }
+                    //a boolean which will return true at the end of the array if there is no element that contrains the same string.
+                    boolean notDuplicate = false;
 
-                String currentAction = action.getText().toString();
+                    //Have to add this as we do not go around the for loop with an empty array...
+                    if (actionArray.size() == 0) {
+                        notDuplicate = true;
+                    }
 
-                //only do this if the user has not left the box blank.
-                if (!TextUtils.isEmpty(action.getText().toString())) {
+                    String currentAction = action.getText().toString();
 
-                    //caling action added from actions.java, this adds to the counter array, and the action array and returns a bool which we will use to decide what to print.
-                    boolean isAction = mServer.actionAdded(currentAction);
-                    //if it's a new action print action registered.
-                    if(isAction) {
+                    //only do this if the user has not left the box blank.
+                    if (!TextUtils.isEmpty(action.getText().toString())) {
+
+                        //caling action added from actions.java, this adds to the counter array, and the action array and returns a bool which we will use to decide what to print.
+                        boolean isAction = mServer.actionAdded(currentAction);
+                        //setting hasSelected to true in the server so we know not to add the previous action to the array.
+                        mServer.setHasSelected(true);
+                        //if it's a new action print action registered.
+                        if (isAction) {
+                            addText.setText("Action registered!");
+                        }
+                        //else it's an existing action.
+                        else {
+                            addText.setText("Action already entered. Please use drop down menu!");
+                        }
+                        //resetting the edit text.
+                        action.setText(null);
+                    }
+                    //or if the action array is 0 this means that the user has never typed anything in the box, and there is no history, in this case do nothing
+                    else if (TextUtils.isEmpty(action.getText().toString()) && actionArray.size() == 0) {
+                        addText.setText("Please type something in the text box above.");
+
+                    } else {
+                        String dropDownMenuText = actionMenu.getSelectedItem().toString();
+
+                        mServer.incrementArray(dropDownMenuText);
+
                         addText.setText("Action registered!");
+                        System.out.println("Drop down menu: " + dropDownMenuText);
+
+                        //rearranging the array so we know that dropDownMenuText was the last element selected.
+                        mServer.rearrangeArray(dropDownMenuText);
+                        mServer.setPreviousActions(dropDownMenuText);
+
+                        //resetting the edit text.
+                        action.setText(null);
+
                     }
-                    //else it's an existing action.
-                    else {
-                        addText.setText("Action already entered. Please use drop down menu!");
-                    }
-                    //resetting the edit text.
-                    action.setText(null);
                 }
-                //or if the action array is 0 this means that the user has never typed anything in the box, and there is no history, in this case do nothing
-                else if (TextUtils.isEmpty(action.getText().toString()) && actionArray.size() == 0) {
-                    addText.setText("Please type something in the text box above.");
-
-                } else {
-                    String dropDownMenuText = actionMenu.getSelectedItem().toString();
-
-                    mServer.incrementArray(dropDownMenuText);
-
-                    addText.setText("Action registered!");
-                    System.out.println("Drop down menu: " + dropDownMenuText);
-
-                    //rearranging the array so we know that dropDownMenuText was the last element selected.
-                    mServer.rearrangeArray(dropDownMenuText);
-                    mServer.setPreviousActions(dropDownMenuText);
-
-                    //resetting the edit text.
+                //else we have selected something in the last hour
+                else {
+                    //reset edit text.
                     action.setText(null);
-
+                    addText.setText(null);
+                    //informing the user they have already typed an action in the last hour.
+                    hasEnteredText.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -370,6 +388,10 @@ public class MainActivity extends AppCompatActivity {
                 previousActions = mServer.previousActions;
             }
 
+            if(mServer.getHasSelected() == true) {
+                hasEnteredText.setVisibility(View.VISIBLE);
+            }
+
 
 
             //setting the previousText boxes initially.
@@ -493,7 +515,8 @@ public class MainActivity extends AppCompatActivity {
             Intent editPage = new Intent (this, Edit.class);
             startActivity(editPage);
         } else if(item.toString().equals(menu5)) {
-
+            Intent editPage = new Intent (this, EditGoalsAndSleepTimes.class);
+            startActivity(editPage);
         }
         return super.onOptionsItemSelected(item);
     }
