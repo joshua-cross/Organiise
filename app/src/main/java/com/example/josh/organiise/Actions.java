@@ -932,7 +932,7 @@ public class Actions extends Service {
                     newYearlyElement = false;
                     //do things here
                     //the new counter integer.
-                    int newYearlyCounter = yearlyActionCounter.get(x) + 1;
+                    int newYearlyCounter = yearlyActionCounter.get(x) + actionCounter.get(i);
                     //setting the yearly action counter to be the new value.
                     yearlyActionCounter.set(x, newYearlyCounter);
                     System.out.println("Daily element: " + actionArray.get(i) + " exists in the yearly array, the new count is: " + yearlyActionCounter.get(x));
@@ -944,7 +944,7 @@ public class Actions extends Service {
             if(isNew) {
                 //add to array.
                 yearlyActionArray.add(actionArray.get(i));
-                yearlyActionCounter.add(1);
+                yearlyActionCounter.add(actionCounter.get(i));
             }
         }
 

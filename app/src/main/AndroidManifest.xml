@@ -28,7 +28,9 @@
             android:exported="true" />
 
         <activity android:name=".ChartDailyPreview" />
-        <activity android:name=".Edit"></activity>
+        <activity android:name=".Edit" />
+        <activity android:name=".ChartMonthlyPreview" />
+        <activity android:name=".ChartYearlyPreview"></activity>
     </application>
 
 </manifest>

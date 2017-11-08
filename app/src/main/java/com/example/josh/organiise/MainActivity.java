@@ -481,11 +481,14 @@ public class MainActivity extends AppCompatActivity {
         String menu5 = getResources().getString(R.string.menuText5);
 
         if(item.toString().equals(menu1)) {
-            System.out.println("smashing!");
+            Intent editPage = new Intent (this, ChartDailyPreview.class);
+            startActivity(editPage);
         } else if(item.toString().equals(menu2)) {
-
+            Intent editPage = new Intent (this, ChartMonthlyPreview.class);
+            startActivity(editPage);
         } else if(item.toString().equals(menu3)) {
-
+            Intent editPage = new Intent (this, ChartYearlyPreview.class);
+            startActivity(editPage);
         } else if(item.toString().equals(menu4)) {
             Intent editPage = new Intent (this, Edit.class);
             startActivity(editPage);

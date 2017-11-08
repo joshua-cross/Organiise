@@ -4,7 +4,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-//import android.graphics.Color;
 import android.graphics.Color;
 import android.os.IBinder;
 import android.support.v7.app.ActionBar;
@@ -30,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ChartDailyPreview extends AppCompatActivity {
+public class ChartMonthlyPreview extends AppCompatActivity {
 
     Button back;
     boolean mBounded;
@@ -45,7 +44,7 @@ public class ChartDailyPreview extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chart_daily_preview);
+        setContentView(R.layout.activity_chart_monthly_preview);
 
         back = (Button) findViewById(R.id.Back);
 
@@ -81,25 +80,25 @@ public class ChartDailyPreview extends AppCompatActivity {
     ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Toast.makeText(ChartDailyPreview.this, "Service is disconnected", 1000).show();
+            Toast.makeText(ChartMonthlyPreview.this, "Service is disconnected", 1000).show();
             mBounded = false;
             mServer = null;
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Toast.makeText(ChartDailyPreview.this, "Service is connected", 1000).show();
+            Toast.makeText(ChartMonthlyPreview.this, "Service is connected", 1000).show();
             mBounded = true;
             Actions.LocalBinder mLocalBinder = (Actions.LocalBinder)service;
             mServer = mLocalBinder.getServerInstance();
 
             //if there are some actions in the array.
             if(mServer.getActionArray().size() != 0) {
-                elementNames = mServer.getActionArray();
+                elementNames = mServer.getMonthlyActionArray();
             }
             //if there are integers attributed to this data.
             if(mServer.getActionCounter().size() != 0) {
-                elementData = mServer.getActionCounter();
+                elementData = mServer.getMonthlyActionCounter();
             }
 
             createDailyPieChart();
@@ -109,7 +108,7 @@ public class ChartDailyPreview extends AppCompatActivity {
 
     private void createDailyPieChart() {
         if(dailyBarChart != null) {
-            //System.out.println("WARNING!: chart null, program will crash...");
+            System.out.println("WARNING!: chart null, program will crash...");
 
             //list that will fill pie chart.
             List<PieEntry> actions = new ArrayList<>();
@@ -119,6 +118,7 @@ public class ChartDailyPreview extends AppCompatActivity {
             }
 
             ArrayList<Integer> colours = new ArrayList<>();
+
 
             //for loop that loops through each of the elements in the actions array, from there it creates a random color to each one which is assigned to the colours array list.
             //this is different for each of the elements in the chart.
@@ -133,8 +133,6 @@ public class ChartDailyPreview extends AppCompatActivity {
                 int colour = Color.rgb(r, g, b);
                 colours.add(colour);
             }
-
-
 
             PieDataSet actionData = new PieDataSet(actions, "Pie chart for yesterdays actions.");
             actionData.setColors(colours);
@@ -154,6 +152,12 @@ public class ChartDailyPreview extends AppCompatActivity {
             //dailyBarChart.getLegend().setWordWrapEnabled(true);
             dailyBarChart.getLegend().setTextColor(Color.WHITE);
             dailyBarChart.getLegend().setTextSize(12.0f);
+
+            //dailyBarChart.getLegend().setPosition(Legend.LegendPosition.RIGHT_OF_CHART_CENTER);
+
+
+            // set custom labels and colors
+            //l.setCustom(ColorTemplate.VORDIPLOM_COLORS, actions);
         }
 
     }
