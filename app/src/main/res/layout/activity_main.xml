@@ -21,13 +21,16 @@
 
     <EditText
         android:id="@+id/currentAction"
-        android:layout_width="250dp"
+        android:layout_width="342dp"
         android:layout_height="40dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginStart="14dp"
         android:layout_marginTop="80dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.46"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Introduction" />
 
@@ -35,16 +38,18 @@
         android:id="@+id/submitAction"
         android:layout_width="76dp"
         android:layout_height="40dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="32dp"
         android:background="@color/red"
         android:text="Confirm"
         android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/AlreadyEntered"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/currentAction"
-        app:layout_constraintTop_toBottomOf="@+id/Introduction" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ActionMenu"
+        app:layout_constraintVertical_bias="0.142" />
 
     <Spinner
         android:id="@+id/ActionMenu"
@@ -106,8 +111,9 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
+        android:text="Action already submitted this hour. Either edit or wait till the next hour."
         android:textColor="@color/white"
+        android:textSize="10dp"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

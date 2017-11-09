@@ -598,27 +598,14 @@ public class Actions extends Service {
                     midnight = false;
                     //SETTING THE WAKEUP TIME TO BE 7:00 the next day, and the sleep time to be 23:00 today.
                     Calendar cal = Calendar.getInstance();
-                    tMonth = cal.get(Calendar.MONTH);
-                    tDate = cal.get(Calendar.DATE) + 1;
-                    tToday = cal.get(Calendar.DATE);
-                    tYear = cal.get(Calendar.YEAR);
-                    tSleepHour = 23;
-                    tSleepMinute = 0;
-                    tSleepSecond = 0;
-                    tWakeHour = 07;
-                    tWakeMinute = 0;
-                    tWakeSecond = 0;
-                    //saving this to the tinydb.
-                    tinydb.putInt("todayMonth", tMonth);
-                    tinydb.putInt("tomorrowDate", tDate);
-                    tinydb.putInt("todayDate", tToday);
-                    tinydb.putInt("todayYear", tYear);
-                    tinydb.putInt("todaySleepHour", tSleepHour);
-                    tinydb.putInt("todaySleepMinute", tSleepMinute);
-                    tinydb.putInt("todaySleepSecond", tSleepSecond);
-                    tinydb.putInt("todayWakeSecond", tWakeSecond);
-                    tinydb.putInt("todayWakeMinute", tWakeMinute);
-                    tinydb.putInt("todayWakeHour", tWakeHour);
+
+                    //if wakeup hour is more than sleep hour this means that the user has gone to sleep the same day as they wake up e.g. 01:00 to 08:00
+                    if(tWakeHour > tSleepHour) {
+                        setSleepAndWakeupTimes(true, tSleepHour, tSleepMinute, tWakeHour, tWakeMinute);
+                    } else {
+                        setSleepAndWakeupTimes(false, tSleepHour, tSleepMinute, tWakeHour, tWakeMinute);
+                    }
+
                 }
 
 
@@ -1058,6 +1045,114 @@ public class Actions extends Service {
     //getter for hasSelected.
     public boolean getHasSelected(){
         return hasSelected;
+    }
+
+    //setter for the wakeup and sleep times; takes the times from the edit time class, and the boolean sameDay which determines if the user wakes up on the same day as they sleep.
+    public void setSleepAndWakeupTimes(boolean sameDay, int sHour, int sMinute, int wHour, int wMinute) {
+        Calendar sleep = Calendar.getInstance();
+        sleep.set(sleep.get(Calendar.YEAR), sleep.get(Calendar.MONTH), sleep.get(Calendar.DATE), sHour, sMinute, 00);
+        if(sameDay) {
+            Date now = new Date();
+
+            int second = 00;
+
+            if(now.after(sleep.getTime())) {
+                //setting sleeptime to be this time today..
+                sleep.set(sleep.get(Calendar.YEAR), sleep.get(Calendar.MONTH), sleep.get(Calendar.DATE) + 1, sHour, sMinute, 00);
+
+
+                Context context = Actions.this.getApplicationContext();
+                TinyDB tinydb = new TinyDB(context);
+
+                tYear = sleep.get(Calendar.YEAR);
+                tMonth = sleep.get(Calendar.MONTH);
+                tDate = Calendar.getInstance().get(Calendar.DATE) + 1;
+                tToday = Calendar.getInstance().get(Calendar.DATE) + 1;
+                tSleepHour = sHour;
+                tSleepMinute = sMinute;
+                tSleepSecond = 00;
+                tWakeSecond = 00;
+                tWakeMinute = wMinute;
+                tWakeHour = wHour;
+                //saving this to the tinydb.
+                tinydb.putInt("todayMonth", tMonth);
+                tinydb.putInt("tomorrowDate", tDate);
+                tinydb.putInt("todayDate", tToday);
+                tinydb.putInt("todayYear", tYear);
+                tinydb.putInt("todaySleepHour", tSleepHour);
+                tinydb.putInt("todaySleepMinute", tSleepMinute);
+                tinydb.putInt("todaySleepSecond", tSleepSecond);
+                tinydb.putInt("todayWakeSecond", tWakeSecond);
+                tinydb.putInt("todayWakeMinute", tWakeMinute);
+                tinydb.putInt("todayWakeHour", tWakeHour);
+
+
+            } else {
+
+                Context context = Actions.this.getApplicationContext();
+                TinyDB tinydb = new TinyDB(context);
+
+
+                tYear = sleep.get(Calendar.YEAR);
+                tMonth = sleep.get(Calendar.MONTH);
+                tDate = sleep.get(Calendar.DATE);
+                tToday = sleep.get(Calendar.DATE);
+                tSleepHour = sHour;
+                tSleepMinute = sMinute;
+                tSleepSecond = 00;
+                tWakeSecond = 00;
+                tWakeMinute = wMinute;
+                tWakeHour = wHour;
+                //saving this to the tinydb.
+                tinydb.putInt("todayMonth", tMonth);
+                tinydb.putInt("tomorrowDate", tDate);
+                tinydb.putInt("todayDate", tToday);
+                tinydb.putInt("todayYear", tYear);
+                tinydb.putInt("todaySleepHour", tSleepHour);
+                tinydb.putInt("todaySleepMinute", tSleepMinute);
+                tinydb.putInt("todaySleepSecond", tSleepSecond);
+                tinydb.putInt("todayWakeSecond", tWakeSecond);
+                tinydb.putInt("todayWakeMinute", tWakeMinute);
+                tinydb.putInt("todayWakeHour", tWakeHour);
+
+            }
+        } else {
+            Context context = Actions.this.getApplicationContext();
+            TinyDB tinydb = new TinyDB(context);
+
+            tYear = sleep.get(Calendar.YEAR);
+            tMonth = sleep.get(Calendar.MONTH);
+            tDate = sleep.get(Calendar.DATE) + 1;
+            tToday = sleep.get(Calendar.DATE);
+            tSleepHour = sHour;
+            tSleepMinute = sMinute;
+            tSleepSecond = 00;
+            tWakeSecond = 00;
+            tWakeMinute = wMinute;
+            tWakeHour = wHour;
+            //saving this to the tinydb.
+            tinydb.putInt("todayMonth", tMonth);
+            tinydb.putInt("tomorrowDate", tDate);
+            tinydb.putInt("todayDate", tToday);
+            tinydb.putInt("todayYear", tYear);
+            tinydb.putInt("todaySleepHour", tSleepHour);
+            tinydb.putInt("todaySleepMinute", tSleepMinute);
+            tinydb.putInt("todaySleepSecond", tSleepSecond);
+            tinydb.putInt("todayWakeSecond", tWakeSecond);
+            tinydb.putInt("todayWakeMinute", tWakeMinute);
+            tinydb.putInt("todayWakeHour", tWakeHour);
+
+            tinydb.putInt("todayMonth", sleep.get(Calendar.MONTH));
+            tinydb.putInt("tomorrowDate", sleep.get(Calendar.DATE) + 1);
+            tinydb.putInt("todayDate", sleep.get(Calendar.DATE));
+            tinydb.putInt("todayYear", sleep.get(Calendar.YEAR));
+            tinydb.putInt("todaySleepHour", sHour);
+            tinydb.putInt("todaySleepMinute", sMinute);
+            tinydb.putInt("todaySleepSecond", second);
+            tinydb.putInt("todayWakeSecond", second);
+            tinydb.putInt("todayWakeMinute", wMinute);
+            tinydb.putInt("todayWakeHour", wHour);
+        }
     }
 
 

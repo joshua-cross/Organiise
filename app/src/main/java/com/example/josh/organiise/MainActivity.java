@@ -1,5 +1,6 @@
 package com.example.josh.organiise;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import android.content.ServiceConnection;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Integer> actionCounter = new ArrayList<Integer>();
 
     TextView addText;
+    TextView intro;
     Spinner actionMenu;
 
     //text view array for the 5 actions.
@@ -93,6 +95,9 @@ public class MainActivity extends AppCompatActivity {
 
         //the text that tells the user if the data was added.
         addText = (TextView) findViewById(R.id.Add);
+
+        //the introduction text which will have this hour, and the hour in the future, so users know what time they're doing the action for.
+        intro = (TextView) findViewById(R.id.Introduction);
 
         //the drop down menus for the actions.
         actionMenu = (Spinner) findViewById(R.id.ActionMenu);
@@ -197,6 +202,11 @@ public class MainActivity extends AppCompatActivity {
                         //resetting the edit text.
                         action.setText(null);
 
+                        mServer.setConfirmButtonPressed(true);
+                        mServer.setHasSelected(true);
+
+
+
                     }
                 }
                 //else we have selected something in the last hour
@@ -210,6 +220,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
+
+
 
 
 
@@ -466,6 +478,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if(mServer.getActionCounter().size() != 0) {
+
+                    //this hour, which will be used by the intro text so users know the time span for the action.
+                    SimpleDateFormat dateFormatter = new SimpleDateFormat("hh:mm");
+                    Calendar thisHour = Calendar.getInstance();
+                    thisHour.set(1996, 2, 20, thisHour.get(Calendar.HOUR_OF_DAY), 00, 00);
+                    String timeNow = dateFormatter.format(thisHour.getTime());
+                    System.out.println(timeNow);
+
+                    Calendar nextHour = Calendar.getInstance();
+                    nextHour.set(1996, 2, 20, thisHour.get(Calendar.HOUR_OF_DAY) + 1, 00, 00);
+                    String timeNextHour = dateFormatter.format(nextHour.getTime());
+                    System.out.println(timeNextHour);
+
+                    //printing the timespan for the action.
+                    intro.setText("Type actiong for hour: " + timeNow + " - " + timeNextHour);
+
+
+
 
                     actionArray = mServer.getActionArray();
                     previousActions = mServer.getPreviousActions();

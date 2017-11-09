@@ -4,7 +4,7 @@
     <string name="menuText2">Preview Monthly Chart</string>
     <string name="menuText3">Preview Yearly Chart</string>
     <string name="menuText4">Edit Previous Actions</string>
-    <string name="menuText5">Edit Goals and Sleep Times</string>
+    <string name="menuText5">Edit Sleep and Wakeup Times</string>
 
     <string name="appName">Organiise</string>
     <color name="grey">#282828</color>
