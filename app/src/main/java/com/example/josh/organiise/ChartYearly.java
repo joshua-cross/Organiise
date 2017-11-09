@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ChartYearlyPreview extends AppCompatActivity {
+public class ChartYearly extends AppCompatActivity {
 
     Button back;
     boolean mBounded;
@@ -44,7 +44,7 @@ public class ChartYearlyPreview extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chart_yearly_preview);
+        setContentView(R.layout.activity_chart_yearly);
 
 
         dailyBarChart = (PieChart) findViewById(R.id.DailyChartPreview);
@@ -79,14 +79,14 @@ public class ChartYearlyPreview extends AppCompatActivity {
     ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Toast.makeText(ChartYearlyPreview.this, "Service is disconnected", 1000).show();
+            Toast.makeText(ChartYearly.this, "Service is disconnected", 1000).show();
             mBounded = false;
             mServer = null;
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Toast.makeText(ChartYearlyPreview.this, "Service is connected", 1000).show();
+            Toast.makeText(ChartYearly.this, "Service is connected", 1000).show();
             mBounded = true;
             Actions.LocalBinder mLocalBinder = (Actions.LocalBinder)service;
             mServer = mLocalBinder.getServerInstance();
@@ -155,6 +155,7 @@ public class ChartYearlyPreview extends AppCompatActivity {
 
                 //dailyBarChart.getLegend().setPosition(Legend.LegendPosition.RIGHT_OF_CHART_CENTER);
 
+                mServer.clearYearlyArrays();
 
                 // set custom labels and colors
                 //l.setCustom(ColorTemplate.VORDIPLOM_COLORS, actions);

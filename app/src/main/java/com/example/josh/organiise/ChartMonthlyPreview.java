@@ -112,51 +112,53 @@ public class ChartMonthlyPreview extends AppCompatActivity {
             //list that will fill pie chart.
             List<PieEntry> actions = new ArrayList<>();
             //looping through the actions, and the counters.
-            for (int i = 0; i < elementNames.size(); i = i + 1) {
-                actions.add(new PieEntry(elementData.get(i), elementNames.get(i)));
+            if (elementNames != null) {
+                for (int i = 0; i < elementNames.size(); i = i + 1) {
+                    actions.add(new PieEntry(elementData.get(i), elementNames.get(i)));
+                }
+
+                ArrayList<Integer> colours = new ArrayList<>();
+
+
+                //for loop that loops through each of the elements in the actions array, from there it creates a random color to each one which is assigned to the colours array list.
+                //this is different for each of the elements in the chart.
+                for (int i = 0; i < elementNames.size(); i = i + 1) {
+                    //creating random RGB elements between 0 and 255.
+                    int r = ThreadLocalRandom.current().nextInt(0, 255 + 1);
+                    int g = ThreadLocalRandom.current().nextInt(0, 255 + 1);
+                    int b = ThreadLocalRandom.current().nextInt(0, 255 + 1);
+
+                    //System.out.println("R: " + r + " G: " + g + " B: " + b);
+                    //System.out.println(r);
+                    int colour = Color.rgb(r, g, b);
+                    colours.add(colour);
+                }
+
+                PieDataSet actionData = new PieDataSet(actions, "Pie chart for yesterdays actions.");
+                actionData.setColors(colours);
+                PieData data = new PieData(actionData);
+
+                //dailyBarChart.getAxisLeft().setTextColor(R.color.white); // left y-axis
+                //dailyBarChart.getXAxis().setTextColor(R.color.white);
+                //dailyBarChart.animateX(500);
+                Legend l = dailyBarChart.getLegend();
+                l.setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
+                dailyBarChart.getLegend().setWordWrapEnabled(true);
+                dailyBarChart.getLegend().setXEntrySpace(15f); // set the space between the legend entries on the x-axis
+                dailyBarChart.getLegend().setYEntrySpace(3f);
+                dailyBarChart.setData(data);
+                dailyBarChart.animateY(500);
+                dailyBarChart.invalidate();
+                //dailyBarChart.getLegend().setWordWrapEnabled(true);
+                dailyBarChart.getLegend().setTextColor(Color.WHITE);
+                dailyBarChart.getLegend().setTextSize(12.0f);
+
+                //dailyBarChart.getLegend().setPosition(Legend.LegendPosition.RIGHT_OF_CHART_CENTER);
+
+
+                // set custom labels and colors
+                //l.setCustom(ColorTemplate.VORDIPLOM_COLORS, actions);
             }
-
-            ArrayList<Integer> colours = new ArrayList<>();
-
-
-            //for loop that loops through each of the elements in the actions array, from there it creates a random color to each one which is assigned to the colours array list.
-            //this is different for each of the elements in the chart.
-            for (int i = 0; i < elementNames.size(); i = i + 1) {
-                //creating random RGB elements between 0 and 255.
-                int r = ThreadLocalRandom.current().nextInt(0, 255 + 1);
-                int g = ThreadLocalRandom.current().nextInt(0, 255 + 1);
-                int b = ThreadLocalRandom.current().nextInt(0, 255 + 1);
-
-                //System.out.println("R: " + r + " G: " + g + " B: " + b);
-                //System.out.println(r);
-                int colour = Color.rgb(r, g, b);
-                colours.add(colour);
-            }
-
-            PieDataSet actionData = new PieDataSet(actions, "Pie chart for yesterdays actions.");
-            actionData.setColors(colours);
-            PieData data = new PieData(actionData);
-
-            //dailyBarChart.getAxisLeft().setTextColor(R.color.white); // left y-axis
-            //dailyBarChart.getXAxis().setTextColor(R.color.white);
-            //dailyBarChart.animateX(500);
-            Legend l = dailyBarChart.getLegend();
-            l.setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
-            dailyBarChart.getLegend().setWordWrapEnabled(true);
-            dailyBarChart.getLegend().setXEntrySpace(15f); // set the space between the legend entries on the x-axis
-            dailyBarChart.getLegend().setYEntrySpace(3f);
-            dailyBarChart.setData(data);
-            dailyBarChart.animateY(500);
-            dailyBarChart.invalidate();
-            //dailyBarChart.getLegend().setWordWrapEnabled(true);
-            dailyBarChart.getLegend().setTextColor(Color.WHITE);
-            dailyBarChart.getLegend().setTextSize(12.0f);
-
-            //dailyBarChart.getLegend().setPosition(Legend.LegendPosition.RIGHT_OF_CHART_CENTER);
-
-
-            // set custom labels and colors
-            //l.setCustom(ColorTemplate.VORDIPLOM_COLORS, actions);
         }
 
     }

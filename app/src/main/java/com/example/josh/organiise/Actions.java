@@ -87,6 +87,10 @@ public class Actions extends Service {
 
     IBinder mBinder = new LocalBinder();
 
+    //setting a calendas for the next hour.
+    Calendar nextHour = Calendar.getInstance();
+                //nextHour.set(nextHour.get(Calendar.YEAR), nextHour.get(Calendar.MONTH), day, hour, 00, 00);
+
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
@@ -152,16 +156,24 @@ public class Actions extends Service {
             minute = 0;
             second = 0;
             tinydb.putInt("targetHour", hour);
+            nextHour.set(nextHour.get(Calendar.YEAR), nextHour.get(Calendar.MONTH), day, hour, 00, 00);
+
 
         } else {
 
             Calendar cal = Calendar.getInstance();
             year = cal.get(Calendar.YEAR);
             month = cal.get(Calendar.MONTH);
-            day = cal.get(Calendar.DATE);
+            //if the target hour is 00:00, then the target date is tomorrow. Else it's still today
+            if(hour == 24) {
+                day = cal.get(Calendar.DATE) + 1;
+            } else {
+                day = cal.get(Calendar.DATE);
+            }
             minute = 0;
             second = 0;
             hour = tinydb.getInt("targetHour");
+            nextHour.set(nextHour.get(Calendar.YEAR), nextHour.get(Calendar.MONTH), day, hour, 00, 00);
         }
 
         //checking if the daily times have a value. if they don't we will assign them a value here.
@@ -469,26 +481,32 @@ public class Actions extends Service {
                 Calendar year = Calendar.getInstance();
                 year.set(yYear, yMonth, yDate, 00, 00, 00);
 
-                Calendar nextHour = Calendar.getInstance();
-                nextHour.set(nextHour.get(Calendar.YEAR), nextHour.get(Calendar.MONTH), day, hour, 00, 00);
+
 
 
                 Date now = new Date();
                 //System.out.println(now);
 
-                //System.out.println("Wake: " + cWakeup.getTime());
-                //System.out.println("Sleep: " + cSleep.getTime());
+                System.out.println("Wake: " + cWakeup.getTime());
+                System.out.println("Sleep: " + cSleep.getTime());
                 //System.out.println("now: " + now);
                 //System.out.println("month: " + month.getTime());
                 //System.out.println("year: " + year.getTime());
-                System.out.println("hour: " + nextHour.getTime());
+                //System.out.println("hour: " + nextHour.getTime());
+                //System.out.println("hour: " + hour);
 
                 if(now.after(nextHour.getTime())) {
                     Context context = Actions.this.getApplicationContext();
                     TinyDB tinydb = new TinyDB(context);
                     Calendar cal = Calendar.getInstance();
+
+                    day = cal.get(Calendar.DATE);
+
                     hour = cal.get(Calendar.HOUR_OF_DAY) + 1;
-                    tinydb.putInt("targetHour", yMonth);
+
+
+                    nextHour.set(nextHour.get(Calendar.YEAR), nextHour.get(Calendar.MONTH), day, hour, 00, 00);
+                    tinydb.putInt("targetHour", hour);
                     //if the user has not selected snything in the last hour, then we will increment the previously chosen action
                     if(!hasSelected) {
                         //only add the previous if we are not yet asleep.
@@ -504,6 +522,7 @@ public class Actions extends Service {
                         //if we are asleep then we're going to add sleep instead.
                         } else {
                             actionAdded("sleep");
+                            setPreviousActions("sleep");
                         }
                     }
                     //else they have selected something, in this case we will reset hasSelected for the last hour.
@@ -529,6 +548,7 @@ public class Actions extends Service {
                     tinydb.putInt("yearMonth", yMonth);
                     tinydb.putInt("yearDate", yDate);
                     tinydb.putInt("yearYear", yYear);
+                    yearlyChartNotification();
                 }
 
                 if(now.after(month.getTime())) {
@@ -542,6 +562,7 @@ public class Actions extends Service {
                     tinydb.putInt("monthMonth", mMonth);
                     tinydb.putInt("monthDate", mDate);
                     tinydb.putInt("monthYear", mYear);
+                    monthlyChartNotification();
                 }
 
 
@@ -814,7 +835,7 @@ public class Actions extends Service {
         notificationmgr.notify(0,notif);
     }
 
-    //function that prints the notifications, this will be printed every hour.
+    //function that prints the notifications, this will be printed every day at midnight.
     public void dailyChartNotification() {
 
         NotificationManager notificationmgr = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
@@ -834,6 +855,50 @@ public class Actions extends Service {
 
 
         notificationmgr.notify(1,notif);
+    }
+
+    //function that prints the notifications, this will be printed every month at midnight.
+    public void monthlyChartNotification() {
+
+        NotificationManager notificationmgr = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        Intent intent = new Intent(this, ChartMonthly.class);
+        PendingIntent pintent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
+
+        //   PendingIntent pintent = PendingIntent.getActivities(this,(int)System.currentTimeMillis(),intent, 0);
+
+
+        Notification notif = new Notification.Builder(this)
+                //the location of the icon.
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Monthly Chart Ready")
+                .setContentText("Click here to view your monthly notification")
+                .setContentIntent(pintent)
+                .build();
+
+
+        notificationmgr.notify(2,notif);
+    }
+
+    //function that prints the notifications, this will be printed every month at midnight.
+    public void yearlyChartNotification() {
+
+        NotificationManager notificationmgr = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        Intent intent = new Intent(this, ChartYearly.class);
+        PendingIntent pintent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
+
+        //   PendingIntent pintent = PendingIntent.getActivities(this,(int)System.currentTimeMillis(),intent, 0);
+
+
+        Notification notif = new Notification.Builder(this)
+                //the location of the icon.
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Yearly Chart Ready")
+                .setContentText("Click here to view your yearly notification")
+                .setContentIntent(pintent)
+                .build();
+
+
+        notificationmgr.notify(3,notif);
     }
 
     //getter for the action list.
@@ -900,7 +965,7 @@ public class Actions extends Service {
         yearlyActionCounter.clear();
         Context context = Actions.this.getApplicationContext();
         TinyDB tinydb = new TinyDB(context);
-        tinydb.putListString("yealryActions", yearlyActionArray);
+        tinydb.putListString("yearlyActions", yearlyActionArray);
         tinydb.putListInt("yearlyCounter", yearlyActionCounter);
     }
 

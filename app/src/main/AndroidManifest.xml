@@ -31,7 +31,9 @@
         <activity android:name=".Edit" />
         <activity android:name=".ChartMonthlyPreview" />
         <activity android:name=".ChartYearlyPreview" />
-        <activity android:name=".EditGoalsAndSleepTimes"></activity>
+        <activity android:name=".EditGoalsAndSleepTimes" />
+        <activity android:name=".ChartMonthly" />
+        <activity android:name=".ChartYearly"></activity>
     </application>
 
 </manifest>

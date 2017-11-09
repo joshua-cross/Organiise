@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class ChartYearlyPreview extends AppCompatActivity {
+public class ChartMonthly extends AppCompatActivity {
 
     Button back;
     boolean mBounded;
@@ -44,7 +44,7 @@ public class ChartYearlyPreview extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chart_yearly_preview);
+        setContentView(R.layout.activity_chart_monthly);
 
 
         dailyBarChart = (PieChart) findViewById(R.id.DailyChartPreview);
@@ -79,25 +79,25 @@ public class ChartYearlyPreview extends AppCompatActivity {
     ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            Toast.makeText(ChartYearlyPreview.this, "Service is disconnected", 1000).show();
+            Toast.makeText(ChartMonthly.this, "Service is disconnected", 1000).show();
             mBounded = false;
             mServer = null;
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Toast.makeText(ChartYearlyPreview.this, "Service is connected", 1000).show();
+            Toast.makeText(ChartMonthly.this, "Service is connected", 1000).show();
             mBounded = true;
             Actions.LocalBinder mLocalBinder = (Actions.LocalBinder)service;
             mServer = mLocalBinder.getServerInstance();
 
             //if there are some actions in the array.
             if(mServer.getActionArray().size() != 0) {
-                elementNames = mServer.getYearlyActionArray();
+                elementNames = mServer.getMonthlyActionArray();
             }
             //if there are integers attributed to this data.
             if(mServer.getActionCounter().size() != 0) {
-                elementData = mServer.getYearlyActionCounter();
+                elementData = mServer.getMonthlyActionCounter();
             }
 
             createDailyPieChart();
@@ -155,7 +155,7 @@ public class ChartYearlyPreview extends AppCompatActivity {
 
                 //dailyBarChart.getLegend().setPosition(Legend.LegendPosition.RIGHT_OF_CHART_CENTER);
 
-
+                mServer.clearMonthlyArrays();
                 // set custom labels and colors
                 //l.setCustom(ColorTemplate.VORDIPLOM_COLORS, actions);
             }
