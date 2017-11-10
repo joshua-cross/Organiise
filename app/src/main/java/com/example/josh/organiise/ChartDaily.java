@@ -4,11 +4,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,7 +28,10 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -143,6 +149,9 @@ public class ChartDaily extends AppCompatActivity {
         //will add the daily array, and clear the old daily array.
         mServer.addDailyArrays();
 
+        //taking a screenshot of the application
+        //takeScreenshot();
+
     }
 
     @Override
@@ -190,4 +199,44 @@ public class ChartDaily extends AppCompatActivity {
         }
     };
     */
+
+    /*
+    //a function that will create a screenshot when the chat page is loaded
+    public void takeScreenshot() {
+
+        //getting the date and time right now.
+        Date now = new Date();
+        //converting this date and time to a text format.
+        android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
+
+        try {
+
+            //getting save location of the printscreen.
+            String path = Environment.getExternalStorageState() + "/" + now + ".jpg";
+
+            //creating a bitmap screen capture.
+            View rootView = this.findViewById(R.id.DailyChart);
+            View v1 = rootView.getRootView();
+            rootView.setDrawingCacheEnabled(true);
+            //creating a bitmap from the current view.
+            Bitmap bPrintScreen = Bitmap.createBitmap(rootView.getDrawingCache());
+            rootView.setDrawingCacheEnabled(false);
+
+            File fPrintscreen = new File(path);
+
+            //creating and compressing printscreen.
+            FileOutputStream outputStream = new FileOutputStream(fPrintscreen);
+            int quality = 100;
+            bPrintScreen.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+            outputStream.flush();
+            outputStream.close();
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+
+    }
+    */
+
+
 }

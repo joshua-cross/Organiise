@@ -16,12 +16,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ChartDaily" />
+        <activity android:name=".ChartDaily"
+            android:screenOrientation="portrait" />
+
 
         <service
             android:name=".Activity"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            />
         <service
             android:name=".Actions"
             android:enabled="true"
@@ -32,8 +35,14 @@
         <activity android:name=".ChartMonthlyPreview" />
         <activity android:name=".ChartYearlyPreview" />
         <activity android:name=".EditGoalsAndSleepTimes" />
-        <activity android:name=".ChartMonthly" />
-        <activity android:name=".ChartYearly"></activity>
+        <activity android:name=".ChartMonthly"
+            android:screenOrientation="portrait" />
+
+        <activity android:name=".ChartYearly"
+            android:screenOrientation="portrait" />
     </application>
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 </manifest>
